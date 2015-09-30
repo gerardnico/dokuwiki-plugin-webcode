@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Color: Sets new colors for text and background.
+ * Plugin Webcode: Show webcode (Css, HTML) in a iframe
  *
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
- * @author     Christopher Smith <chris@jalakai.co.uk>
+ * @author     Nicolas GERARD
  */
 
 // must be run within Dokuwiki
