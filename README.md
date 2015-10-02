@@ -59,7 +59,7 @@ The scale of the attributes values may be:
   * %
   * or px (pixel)
 
-The actual code block supported are:
+The actual [code blocks](https://www.dokuwiki.org/wiki:syntax#code_blocks) supported are:
 
   * code css
   * code html or code xml. Xml will be seen as HTML.
