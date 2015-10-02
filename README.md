@@ -4,7 +4,7 @@
 
 The [Webocde Dokuwiki plugin](https://www.dokuwiki.org/plugin:webcode)  renders the output of CSS and HTML block code.
 
-By enclosing the code blocks by a webcode block, the plugin will add the result after.
+By enclosing the [code blocks](https://www.dokuwiki.org/wiki:syntax#code_blocks) by a webcode block, the plugin will add the result after the last webcode tag.
 
 See the webcode plugin page [here](https://www.dokuwiki.org/plugin:webcode)
 
