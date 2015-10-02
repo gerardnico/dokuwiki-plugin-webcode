@@ -7,7 +7,6 @@
  */
  
 // for the configuration manager
-$lang['WebCodeTag'] = 'The webcode tag';
-$lang['WebCodeShortCutKey'] = 'The shortcut access key to add to the webcode tag';
+$lang['WebCodeShortCutKey'] = 'The shortcut access key for the toolbar button (edit mode)';
 
 ?>

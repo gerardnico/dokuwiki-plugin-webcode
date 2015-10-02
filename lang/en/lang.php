@@ -7,9 +7,8 @@
  */
  
 
-
+/* The titel of the toolbar button */
 $lang['WebCodeButtonTitle'] = 'Insert a Web code';
-
 $lang['Accesskey'] = 'Accesskey';
 
 ?>
