@@ -29,18 +29,18 @@ Install the plugin using:
 ```xml
 <webcode width=100% frameborder=0 height=250px>
 
-    // wiki syntax with css or html block code.
+    <!-- wiki syntax with css or html block code. -->
     Full dokuwiki syntax are permitted between blocks
 
-    // css code block
+    <!-- css code block -->
     <code css>
     </code>
 
-    // html code block
+    <!-- html code block -->
     <code html>
     </code>
 
-    // An xml block may be use in place of an html one
+    <!-- An xml block may be use in place of an html one -->
     <code xml>
     </code>
 
