@@ -5,4 +5,4 @@ date     2015-09-18
 name     Webcode Plugin
 desc     Plugin that shows and adds the result of (web|browser) code (ie HTML and/or CSS)
 url      https://www.dokuwiki.org/plugin:webcode
-url      https://github.com/..../master
+url      https://github.com/gerardnico/dokuwiki-plugin-webcode
