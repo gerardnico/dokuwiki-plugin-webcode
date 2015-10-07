@@ -74,7 +74,9 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
                 $match = utf8_substr($match, 8, -1); //9 = strlen("<webcode")
 
-                $this->attributes['frameborder'] = 0;
+                $this->attributes['frameborder'] = 1;
+                $this->attributes['width'] = '100%';
+
                 // /i not case sensitive
                 $attributePattern = "\\s*(\w+)\\s*=\\s*\"?(\\d+(\%|px)?)\"?\\s*";
                 $result = preg_match_all('/' . $attributePattern . '/i', $match, $matches);
@@ -97,7 +99,9 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
                 if ($result != 0) {
                     foreach ($matches[1] as $key => $codeName) {
-                        $this->codes[strtolower($codeName)] = $matches[2][$key];
+                        // No double quote because the code will goes in the srcdoc attribute of the iframe element
+                        $code = str_replace('"','\'',$matches[2][$key]);
+                        $this->codes[strtolower($codeName)] = $code;
                     }
                 }
 
@@ -153,7 +157,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     foreach ($this->attributes as $key => $attribute) {
                         $iframeHtml = $iframeHtml.' '.$key.'='.$attribute;
                     }
-                    $iframeHtml = $iframeHtml.' srcdoc="<style>'.$this->codes['css'].'</style>'.$htmlContent.'"></iframe>';
+                    $iframeHtml = $iframeHtml.' srcdoc="<head><style>'.$this->codes['css'].'</style></head><body>'.$htmlContent.'</body>"></iframe>';
                     $renderer->doc .= '<P>'.$iframeHtml.'</P>';
                     break;
             }
