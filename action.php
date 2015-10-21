@@ -25,15 +25,14 @@ class action_plugin_webcode extends DokuWiki_Action_Plugin {
     }
 
     function handle_toolbar(&$event, $param) {
-        $webCodeTag = $this->getConf('WebCodeTag');
         $webCodeShortcutKey = $this->getConf('WebCodeShortCutKey');
 
         $event->data[] = array(
             'type'   => 'format',
             'title'  => $this->getLang('WebCodeButtonTitle').' ('.$this->getLang('AccessKey').': '.$webCodeShortcutKey.')',
             'icon'   => '../../plugins/webcode/images/webcode.png',
-            'open'   => '<'.$webCodeTag.'>\n',
-            'close'  => '\n</'.$webCodeTag.'>\n',
+            'open'   => '<webcode frameborder=1 width=100% height=80px >\n',
+            'close'  => '\n</webcode>\n',
             'key'    => $webCodeShortcutKey
         );
 
