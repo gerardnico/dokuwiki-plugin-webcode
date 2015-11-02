@@ -27,11 +27,12 @@ class action_plugin_webcode extends DokuWiki_Action_Plugin {
     function handle_toolbar(&$event, $param) {
         $webCodeShortcutKey = $this->getConf('WebCodeShortCutKey');
 
+        // hieght = 55px is the height of a single line text
         $event->data[] = array(
             'type'   => 'format',
             'title'  => $this->getLang('WebCodeButtonTitle').' ('.$this->getLang('AccessKey').': '.$webCodeShortcutKey.')',
             'icon'   => '../../plugins/webcode/images/webcode.png',
-            'open'   => '<webcode frameborder=1 width=100% height=80px >\n',
+            'open'   => '<webcode frameborder=1 width=100% height=55px >\n',
             'close'  => '\n</webcode>\n',
             'key'    => $webCodeShortcutKey
         );
