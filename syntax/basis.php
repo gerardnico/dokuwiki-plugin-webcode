@@ -47,13 +47,13 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
     // This where the addEntryPattern must bed defined
     public function connectTo($mode)
     {
-        $this->Lexer->addEntryPattern('<webcode.*?>(?=.*?</webcode>)', $mode, 'plugin_webcode_'.$this->getPluginComponent());
+        $this->Lexer->addEntryPattern('<webcode.*?>(?=.*?</webcode>)', $mode, 'plugin_webcode_' . $this->getPluginComponent());
     }
 
     // This where the addPattern and addExitPattern are defined
     public function postConnect()
     {
-        $this->Lexer->addExitPattern('</webcode>', 'plugin_webcode_'.$this->getPluginComponent());
+        $this->Lexer->addExitPattern('</webcode>', 'plugin_webcode_' . $this->getPluginComponent());
     }
 
 
@@ -100,21 +100,28 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                 if ($result != 0) {
                     foreach ($matches[1] as $key => $codeName) {
                         // No double quote because the code will goes in the srcdoc attribute of the iframe element
-                        $code = str_replace('"','\'',$matches[2][$key]);
+                        $code = str_replace('"', '\'', $matches[2][$key]);
                         $this->codes[strtolower($codeName)] = $code;
                     }
                 }
 
+                // If their is xml without html code, xml becomes html code
+                if (!array_key_exists('html', $this->codes)) {
+                    if (array_key_exists('xml', $this->codes)) {
+                        $this->codes['html'] = $this->codes['xml'];
+                        unset($this->codes['xml']);
+                    }
+                }
                 $extractData = $this->codes;
 
                 // Render the whole
                 $instructions = p_get_instructions($match);
-                $xhtmlWebCode = p_render('xhtml',$instructions,$info);
+                $xhtmlWebCode = p_render('xhtml', $instructions, $info);
                 break;
         }
 
         // Cache the values
-        return array($state,$xhtmlWebCode,$extractData);
+        return array($state, $xhtmlWebCode, $extractData);
     }
 
     /**
@@ -135,36 +142,56 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
                 case DOKU_LEXER_ENTER :
                     $stateDesc = 'DOKU_LEXER_ENTER';
-                    // Get back the cached value
+                    // The extracted data are the attribute of the webcode tag
                     $this->attributes = $extractData;
                     break;
                 case DOKU_LEXER_UNMATCHED :
                     $stateDesc = 'DOKU_LEXER_UNMATCHED';
-                    // Get back the cached value
+                    // The extracted data are the code for this step
                     $this->codes = $extractData;
+                    // Add the wiki output between the two webcode tag
                     $renderer->doc .= $xhtmlWebCode;
                     break;
                 case DOKU_LEXER_EXIT :
                     $stateDesc = 'DOKU_LEXER_EXIT';
 
-                    if ( array_key_exists('html', $this->codes)) {
-                        $htmlContent = $this->codes['html'];
-                    } else {
-                        $htmlContent = $this->codes['xml'];
-                    }
-
+                    // We add the Iframe and the JsFiddleButton
                     $iframeHtml = '<iframe ';
                     foreach ($this->attributes as $key => $attribute) {
-                        $iframeHtml = $iframeHtml.' '.$key.'='.$attribute;
+                        $iframeHtml = $iframeHtml . ' ' . $key . '=' . $attribute;
                     }
-                    $iframeHtml = $iframeHtml.' srcdoc="<head><style>'.$this->codes['css'].'</style></head><body>'.$htmlContent.'</body>"></iframe>';
-                    $renderer->doc .= '<P>'.$iframeHtml.'</P>';
+                    $iframeHtml = $iframeHtml . ' srcdoc="<head><style>' . $this->codes['css'] . '</style></head><body>' . $this->codes['html'] . '</body>"></iframe>';
+                    $renderer->doc .= '<div>' . $this->addJsFiddleButton($this->codes) . $iframeHtml . '</div>';
+
+
                     break;
             }
 
             return true;
         }
         return false;
+    }
+
+    /**
+     * @param $codes the array containing the codes
+     * @return string the HTML form code
+     */
+    public function addJsFiddleButton($codes)
+    {
+
+        $jsFiddleButtonHtmlCode =
+            '<div class="webcodeButton">' .
+            '<form method="post" action="https://jsfiddle.net/api/post/library/pure/" target="_blank">' .
+            '<input type="hidden" name="title" value="Title">' .
+            '<input type="hidden" name="css" value="' . $codes['css'] . '">' .
+            '<input type="hidden" name="html" value="' . $codes['html'] . '">' .
+            '<input type="hidden" name="js" value="' . $codes['js'] . '">' .
+            '<button class="btn btn-link">'.$this->getLang('JsFiddleButtonContent').'</button>' .
+            '</form>'.
+            '</div>';
+
+        return $jsFiddleButtonHtmlCode;
+
     }
 
 }

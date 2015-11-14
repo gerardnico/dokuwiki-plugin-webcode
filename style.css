@@ -1,0 +1,11 @@
+/**
+* style.css for the WebCode plugin
+*
+* @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
+* @author     Nicolas GERARD
+*
+*/
+
+.webcodeButton {
+    float: right;
+}
