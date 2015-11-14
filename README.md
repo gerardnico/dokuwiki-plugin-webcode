@@ -72,8 +72,8 @@ None
 Technically, the plugin:
 
   * parses the content between the two `<webcode>` tag,
-  * extracts the css and html code
-  * adds after the last webcode tag an [iframe](https://docs.webplatform.org/wiki/html/elements/iframe)
+  * extracts the css and html code,
+  * adds after the last webcode tag an [iframe](https://docs.webplatform.org/wiki/html/elements/iframe),
   * and a button that permits to play with the code on [JsFiddle](https://jsfiddle.net)
 
 
