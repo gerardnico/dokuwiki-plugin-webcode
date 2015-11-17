@@ -2,7 +2,13 @@
 
 ## Usage
 
-The [Webocde Dokuwiki plugin](https://www.dokuwiki.org/plugin:webcode)  renders the output of CSS and HTML block code.
+The [Webocde Dokuwiki plugin](https://www.dokuwiki.org/plugin:webcode)  renders the output of:
+
+  * CSS
+  * HTML
+  * and Javascript
+
+code block.
 
 By enclosing the [code blocks](https://www.dokuwiki.org/wiki:syntax#code_blocks) by a `<webcode>` block, the plugin will add the result after the last webcode tag.
 
@@ -27,6 +33,7 @@ Install the plugin using:
 ## Syntax
 
 ```xml
+
 <webcode width=100% frameborder=0 height=250px>
 
     <!-- wiki syntax with css or html block code. -->
@@ -42,6 +49,10 @@ Install the plugin using:
 
     <!-- An xml block may be use in place of an html one -->
     <code xml>
+    </code>
+
+    <!-- javascript code block -->
+    <code javascript>
     </code>
 
 </webcode>
@@ -61,8 +72,10 @@ The scale of the attributes values may be:
 
 The actual [code blocks](https://www.dokuwiki.org/wiki:syntax#code_blocks) supported are:
 
-  * code css
   * code html or code xml. Xml will be seen as XHTML.
+  * code css
+  * code javascript
+
 
 ## Configuration and Settings
 None
@@ -72,7 +85,7 @@ None
 Technically, the plugin:
 
   * parses the content between the two `<webcode>` tag,
-  * extracts the css and html code,
+  * extracts the html, css and javascript code,
   * adds after the last webcode tag an [iframe](https://docs.webplatform.org/wiki/html/elements/iframe),
   * and a button that permits to play with the code on [JsFiddle](https://jsfiddle.net)
 

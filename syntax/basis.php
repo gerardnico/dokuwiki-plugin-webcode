@@ -160,7 +160,19 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     foreach ($this->attributes as $key => $attribute) {
                         $iframeHtml = $iframeHtml . ' ' . $key . '=' . $attribute;
                     }
-                    $iframeHtml = $iframeHtml . ' srcdoc="<head><style>' . $this->codes['css'] . '</style></head><body>' . $this->codes['html'] . '</body>"></iframe>';
+                    $iframeHtml .= ' srcdoc="<head>';
+                    if (array_key_exists('css',$this->codes)) {
+                        $iframeHtml .= '<style>'.$this->codes['css'] . '</style>';
+                    };
+                    $iframeHtml .= '</head><body>';
+                    if (array_key_exists('html',$this->codes)){
+                        $iframeHtml .=  $this->codes['html'];
+                    }
+                    if (array_key_exists('javascript',$this->codes)){
+                        $iframeHtml .=  '<script>'.$this->codes['javascript'] . '</script>';
+                    }
+                    $iframeHtml .= '</body>"></iframe>';
+
                     $renderer->doc .= '<div>' . $this->addJsFiddleButton($this->codes) . $iframeHtml . '</div>';
 
 
@@ -185,7 +197,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
             '<input type="hidden" name="title" value="Title">' .
             '<input type="hidden" name="css" value="' . $codes['css'] . '">' .
             '<input type="hidden" name="html" value="' . $codes['html'] . '">' .
-            '<input type="hidden" name="js" value="' . $codes['js'] . '">' .
+            '<input type="hidden" name="js" value="' . $codes['javascript'] . '">' .
             '<button class="btn btn-link">'.$this->getLang('JsFiddleButtonContent').'</button>' .
             '</form>'.
             '</div>';
