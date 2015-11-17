@@ -191,6 +191,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
     public function addJsFiddleButton($codes)
     {
 
+        // From http://doc.jsfiddle.net/api/post.html
         $jsFiddleButtonHtmlCode =
             '<div class="webcodeButton">' .
             '<form method="post" action="https://jsfiddle.net/api/post/library/pure/" target="_blank">' .
@@ -198,6 +199,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
             '<input type="hidden" name="css" value="' . $codes['css'] . '">' .
             '<input type="hidden" name="html" value="' . $codes['html'] . '">' .
             '<input type="hidden" name="js" value="' . $codes['javascript'] . '">' .
+            '<input type="hidden" name="wrap" value="b">' .  //javascript no wrap in body
             '<button class="btn btn-link">'.$this->getLang('JsFiddleButtonContent').'</button>' .
             '</form>'.
             '</div>';
