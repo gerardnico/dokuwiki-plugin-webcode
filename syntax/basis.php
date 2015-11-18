@@ -26,6 +26,11 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
     private $codes = array();
 
+    /**
+     * Print the output of the console javascript function ?
+     */
+    private $useConsole = false;
+
     /*
      * What is the type of this plugin ?
      * This a plugin categorization
@@ -72,8 +77,14 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
             case DOKU_LEXER_ENTER :
 
+                // We got the first webcode tag and its attributes
+
                 $match = utf8_substr($match, 8, -1); //9 = strlen("<webcode")
 
+                // Reset of the attributes
+                // With some framework the php object may be still persisted in memory
+                // And you may get some attributes from other page
+                $this->attributes= array();
                 $this->attributes['frameborder'] = 1;
                 $this->attributes['width'] = '100%';
 
@@ -94,14 +105,35 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
             case DOKU_LEXER_UNMATCHED :
 
+                // We got the content between the webcode tag and its attributes
+
+                // We parse it in order to extract the code.
+
+                // Reset of the variable
+                // With some framework the php object may be still persisted in memory
+                // And you may get some variable from other page
+                $this->codes = array();
+                $this->useConsole = false;
+
+                // Regexp Pattern
                 $codePattern = "\<code\\s*(\\w+)\\s*\>(.+?)\<\/code\>";
                 $result = preg_match_all('/' . $codePattern . '/is', $match, $matches, PREG_PATTERN_ORDER);
-
                 if ($result != 0) {
                     foreach ($matches[1] as $key => $codeName) {
                         // No double quote because the code will goes in the srcdoc attribute of the iframe element
                         $code = str_replace('"', '\'', $matches[2][$key]);
                         $this->codes[strtolower($codeName)] = $code;
+
+                        if (strtolower($codeName)=='javascript'){
+                            // if the code contains 'console.'
+                            $result = preg_match('/' .'console.'. '/is',$code);
+                            if ($result) {
+                                $this->useConsole = true;
+                            } else  {
+                                $this->useConsole = false;
+                            }
+
+                        }
                     }
                 }
 
@@ -160,18 +192,42 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     foreach ($this->attributes as $key => $attribute) {
                         $iframeHtml = $iframeHtml . ' ' . $key . '=' . $attribute;
                     }
-                    $iframeHtml .= ' srcdoc="<head>';
+                    $iframeHtml .= ' srcdoc="<html><head>';
+                    $iframeHtml .= '<meta http-equiv=\'content-type\' content=\'text/html; charset=UTF-8\'>';
+                    $iframeHtml .= '<title>Made by Webcode</title>';
+                    $iframeHtml .= '<link rel=\'stylesheet\' type=\'text/css\' href=\'https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css\'>';
+
+                    // Jquery ?
+                    if (array_key_exists('javascript',$this->codes)) {
+                        // JQuery is used for the console facility
+                        $iframeHtml .= '<script type=\'text/javascript\' src=\'http://code.jquery.com/jquery-2.1.3.min.js\'></script>';
+                    }
+
+                    // WebConsole
+                    if ($this->useConsole) {
+                        $iframeHtml .= '<link rel=\'stylesheet\' type=\'text/css\' href=\'' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.css\'></link>';
+                    }
+
                     if (array_key_exists('css',$this->codes)) {
+                        $iframeHtml .= '<!-- The CSS code -->';
                         $iframeHtml .= '<style>'.$this->codes['css'] . '</style>';
                     };
-                    $iframeHtml .= '</head><body>';
+                    $iframeHtml .= '</head><body style=\'margin:10px\'>';
                     if (array_key_exists('html',$this->codes)){
+                        $iframeHtml .= '<!-- The HTML code -->';
                         $iframeHtml .=  $this->codes['html'];
                     }
+                    // The javascript console area is based at the end of the HTML document
+                    if ($this->useConsole) {
+                        $iframeHtml .= '<!-- WebCode Console -->';
+                        $iframeHtml .= '<div id=\'webCodeConsole\'></div>';
+                        $iframeHtml .= '<script type=\'text/javascript\' src=\''.DOKU_URL.'lib/plugins/webcode/webCodeConsole.js\'></script>';
+                    }
                     if (array_key_exists('javascript',$this->codes)){
+                        $iframeHtml .= '<!-- The Javascript code -->';
                         $iframeHtml .=  '<script>'.$this->codes['javascript'] . '</script>';
                     }
-                    $iframeHtml .= '</body>"></iframe>';
+                    $iframeHtml .= '</body></html>"></iframe>';
 
                     $renderer->doc .= '<div>' . $this->addJsFiddleButton($this->codes) . $iframeHtml . '</div>';
 
@@ -192,9 +248,15 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
     {
 
         // From http://doc.jsfiddle.net/api/post.html
+
+        $postURL = "https://jsfiddle.net/api/post/library/pure/"; //No Framework
+        if (array_key_exists('javascript',$this->codes)){
+            $postURL = "http://jsfiddle.net/api/post/jQuery/2.1.3/";
+        }
+
         $jsFiddleButtonHtmlCode =
             '<div class="webcodeButton">' .
-            '<form method="post" action="https://jsfiddle.net/api/post/library/pure/" target="_blank">' .
+            '<form method="post" action="'.$postURL.'" target="_blank">' .
             '<input type="hidden" name="title" value="Title">' .
             '<input type="hidden" name="css" value="' . $codes['css'] . '">' .
             '<input type="hidden" name="html" value="' . $codes['html'] . '">' .

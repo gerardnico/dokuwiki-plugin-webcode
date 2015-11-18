@@ -90,3 +90,8 @@ Technically, the plugin:
   * and a button that permits to play with the code on [JsFiddle](https://jsfiddle.net)
 
 
+## JQuery
+
+Jquery version 1.9.1 is also by default added if a javascript block is present.
+
+

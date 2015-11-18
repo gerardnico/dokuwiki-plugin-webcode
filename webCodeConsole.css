@@ -1,0 +1,22 @@
+/**
+* The style for the output of the javascript console
+*
+* @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
+* @author     Nicolas GERARD
+*
+*/
+
+#webCodeConsole {
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.webCodeConsoleLine {
+    margin-top:4px;
+    margin-bottom:4px;
+}
