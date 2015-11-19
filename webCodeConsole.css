@@ -6,17 +6,27 @@
 *
 */
 
+body {
+    font-family: Consolas;
+    font-size: 14px;
+    color: #333333;
+}
+
 #webCodeConsole {
-    color: #31708f;
-    background-color: #d9edf7;
-    border-color: #bce8f1;
+    background-color: #E8E8E8;
     padding: 10px;
     margin-bottom: 20px;
-    border: 1px solid transparent;
+    border: 1px solid #969696;
     border-radius: 4px;
 }
 
 .webCodeConsoleLine {
-    margin-top:4px;
-    margin-bottom:4px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.webConsoleTitle {
+    padding-left: 10px;
+    margin-bottom: 4px;
+    font-weight: bold;
 }
