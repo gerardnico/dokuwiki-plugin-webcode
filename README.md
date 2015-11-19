@@ -2,11 +2,11 @@
 
 ## Usage
 
-The [Webocde Dokuwiki plugin](https://www.dokuwiki.org/plugin:webcode)  renders the output of:
+The [Webcode Dokuwiki plugin](https://www.dokuwiki.org/plugin:webcode)  renders the output of:
 
   * CSS
   * HTML
-  * and Javascript
+  * and [Javascript](#javascript)
 
 code block.
 

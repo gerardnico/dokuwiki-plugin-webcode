@@ -195,7 +195,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     $iframeHtml = '<iframe ';
 
                     // We add the HTML attributes
-                    $iframeHtmlAttributes = ['width', 'height', 'frameborder'];
+                    $iframeHtmlAttributes = array('width', 'height', 'frameborder');
                     foreach ($this->attributes as $attribute => $value) {
                         if (in_array($attribute, $iframeHtmlAttributes)) {
                             $iframeHtml .= ' ' . $attribute . '=' . $value;
@@ -210,7 +210,8 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     if (array_key_exists(self::EXTERNAL_RESOURCES_ATTRIBUTE, $this->attributes)) {
                         $externalResources = explode(",", $this->attributes[self::EXTERNAL_RESOURCES_ATTRIBUTE]);
                         foreach ($externalResources as $externalResource) {
-                            $fileExtension = pathinfo($externalResource)['extension'];
+                            $pathInfo = pathinfo($externalResource);
+                            $fileExtension = $pathInfo['extension'];
                             switch ($fileExtension) {
                                 case 'css':
                                     $iframeHtml .= '<link rel=\'stylesheet\' type=\'text/css\' href=\'' . $externalResource . '\'>';
