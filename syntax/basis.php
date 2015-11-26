@@ -179,6 +179,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     // We put in a class variable so that we can use in the last step (DOKU_LEXER_EXIT)
                     $this->attributes = $data[1];
                     break;
+                
                 case DOKU_LEXER_UNMATCHED :
 
                     // The extracted data are the codes for this step
@@ -188,11 +189,12 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     // Add the wiki output between the two webcode tag
                     $renderer->doc .= $data[1];
                     break;
+
                 case DOKU_LEXER_EXIT :
 
                     // Here the magic from the plugin happens
                     // We add the Iframe and the JsFiddleButton
-                    $iframeHtml = '<iframe ';
+                    $iframeHtml = '<iframe name=\'webcode iframe\'';
 
                     // We add the HTML attributes
                     $iframeHtmlAttributes = array('width', 'height', 'frameborder');
