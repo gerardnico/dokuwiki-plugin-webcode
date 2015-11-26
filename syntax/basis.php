@@ -116,8 +116,12 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                 $result = preg_match_all('/' . $codePattern . '/is', $match, $matches, PREG_PATTERN_ORDER);
                 if ($result != 0) {
                     foreach ($matches[1] as $key => $codeName) {
+
+                        // Single quote must be escaped because double quote are forbidden in the src attribute
+                        $code = str_replace('\'', '\\\'', $matches[2][$key]);
                         // No double quote because the code will goes in the srcdoc attribute of the iframe element
-                        $code = str_replace('"', '\'', $matches[2][$key]);
+                        $code = str_replace('"', '\'', $code);
+
                         $codes[strtolower($codeName)] = $code;
 
                         // Check if javascript contains a console function
@@ -179,7 +183,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     // We put in a class variable so that we can use in the last step (DOKU_LEXER_EXIT)
                     $this->attributes = $data[1];
                     break;
-                
+
                 case DOKU_LEXER_UNMATCHED :
 
                     // The extracted data are the codes for this step
