@@ -232,7 +232,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     // Jquery ?
                     if (array_key_exists('javascript', $this->codes)) {
                         // JQuery is used for the console facility
-                        $iframeHtml .= '<script type=\'text/javascript\' src=\'http://code.jquery.com/jquery-2.1.3.min.js\'></script>';
+                        $iframeHtml .= '<script type=\'text/javascript\' src=\'https://code.jquery.com/jquery-2.1.3.min.js\'></script>';
                     }
 
                     // WebConsole style sheet
