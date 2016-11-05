@@ -117,11 +117,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                 if ($result != 0) {
                     foreach ($matches[1] as $key => $codeName) {
 
-                        // Single quote must be escaped because double quote are forbidden in the src attribute
-                        $code = str_replace('\'', '\\\'', $matches[2][$key]);
-                        // No double quote because the code will goes in the srcdoc attribute of the iframe element
-                        $code = str_replace('"', '\'', $code);
-
+                        $code = $matches[2][$key];
                         $codes[strtolower($codeName)] = $code;
 
                         // Check if javascript contains a console function
@@ -196,21 +192,11 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
                 case DOKU_LEXER_EXIT :
 
-                    // Here the magic from the plugin happens
-                    // We add the Iframe and the JsFiddleButton
-                    $iframeHtml = '<iframe name=\'webcode iframe\'';
 
-                    // We add the HTML attributes
-                    $iframeHtmlAttributes = array('width', 'height', 'frameborder');
-                    foreach ($this->attributes as $attribute => $value) {
-                        if (in_array($attribute, $iframeHtmlAttributes)) {
-                            $iframeHtml .= ' ' . $attribute . '=' . $value;
-                        }
-                    }
-                    $iframeHtml .= ' srcdoc="<html><head>';
-                    $iframeHtml .= '<meta http-equiv=\'content-type\' content=\'text/html; charset=UTF-8\'>';
-                    $iframeHtml .= '<title>Made by Webcode</title>';
-                    $iframeHtml .= '<link rel=\'stylesheet\' type=\'text/css\' href=\'https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css\'>';
+                    $htmlContent = '<html><head>';
+                    $htmlContent .= '<meta http-equiv="content-type" content="text/html; charset=UTF-8">';
+                    $htmlContent .= '<title>Made by Webcode</title>';
+                    $htmlContent .= '<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css">';
 
                     // External Resources such as css stylesheet or js
                     if (array_key_exists(self::EXTERNAL_RESOURCES_ATTRIBUTE, $this->attributes)) {
@@ -220,10 +206,10 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                             $fileExtension = $pathInfo['extension'];
                             switch ($fileExtension) {
                                 case 'css':
-                                    $iframeHtml .= '<link rel=\'stylesheet\' type=\'text/css\' href=\'' . $externalResource . '\'>';
+                                    $htmlContent .= '<link rel="stylesheet" type="text/css" href="' . $externalResource . '">';
                                     break;
                                 case 'js':
-                                    $iframeHtml .= '<script type=\'text/javascript\' src=\'' . $externalResource . '\'></script>';
+                                    $htmlContent .= '<script type="text/javascript" src="' . $externalResource . '"></script>';
                                     break;
                             }
                         }
@@ -232,40 +218,61 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     // Jquery ?
                     if (array_key_exists('javascript', $this->codes)) {
                         // JQuery is used for the console facility
-                        $iframeHtml .= '<script type=\'text/javascript\' src=\'https://code.jquery.com/jquery-2.1.3.min.js\'></script>';
+                        $htmlContent .= '<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.3.min.js"></script>';
                     }
 
                     // WebConsole style sheet
                     if ($this->useConsole) {
-                        $iframeHtml .= '<link rel=\'stylesheet\' type=\'text/css\' href=\'' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.css\'></link>';
+                        $htmlContent .= '<link rel="stylesheet" type="text/css" href="' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.css"></link>';
                     }
 
                     if (array_key_exists('css', $this->codes)) {
-                        $iframeHtml .= '<!-- The CSS code -->';
-                        $iframeHtml .= '<style>' . $this->codes['css'] . '</style>';
+                        $htmlContent .= '<!-- The CSS code -->';
+                        $htmlContent .= '<style>' . $this->codes['css'] . '</style>';
                     };
-                    $iframeHtml .= '</head><body style=\'margin:10px\'>';
+                    $htmlContent .= '</head><body style="margin:10px">';
                     if (array_key_exists('html', $this->codes)) {
-                        $iframeHtml .= '<!-- The HTML code -->';
-                        $iframeHtml .= $this->codes['html'];
+                        $htmlContent .= '<!-- The HTML code -->';
+                        $htmlContent .= $this->codes['html'];
                     }
                     // The javascript console area is based at the end of the HTML document
                     if ($this->useConsole) {
-                        $iframeHtml .= '<!-- WebCode Console -->';
-                        $iframeHtml .= '<div><p class=\'webConsoleTitle\'>Console Output:</p>';
-                        $iframeHtml .= '<div id=\'webCodeConsole\'></div>';
-                        $iframeHtml .= '<script type=\'text/javascript\' src=\'' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.js\'></script>';
-                        $iframeHtml .= '</div>';
+                        $htmlContent .= '<!-- WebCode Console -->';
+                        $htmlContent .= '<div><p class=\'webConsoleTitle\'>Console Output:</p>';
+                        $htmlContent .= '<div id=\'webCodeConsole\'></div>';
+                        $htmlContent .= '<script type=\'text/javascript\' src=\'' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.js\'></script>';
+                        $htmlContent .= '</div>';
                     }
                     // The javascript comes at the end because it may want to be applied on previous HTML element
                     // as the page load in the IO order, javascript must be placed at the end
                     if (array_key_exists('javascript', $this->codes)) {
-                        $iframeHtml .= '<!-- The Javascript code -->';
-                        $iframeHtml .= '<script>' . $this->codes['javascript'] . '</script>';
+                        $htmlContent .= '<!-- The Javascript code -->';
+                        $htmlContent .= '<script>' . $this->codes['javascript'] . '</script>';
                     }
-                    $iframeHtml .= '</body></html>"></iframe>';
+                    $htmlContent .= '</body></html>';
 
-                    $renderer->doc .= '<div>' . $this->addJsFiddleButton($this->codes,$this->attributes) . $iframeHtml . '</div>';
+                    // Saving the content in the cache
+                    $web_code_id=hash('md5',$htmlContent);
+                    global $ID;
+
+                    $cache = new cache($ID.$web_code_id, '.webcode');
+                    $cache->storeCache($htmlContent);
+
+                    // Here the magic from the plugin happens
+                    // We add the Iframe and the JsFiddleButton
+                    $iFrameHtml = '<iframe name="WebCode iFrame"';
+
+                    // We add the HTML attributes
+                    $iFrameHtmlAttributes = array('width', 'height', 'frameborder');
+                    foreach ($this->attributes as $attribute => $value) {
+                        if (in_array($attribute, $iFrameHtmlAttributes)) {
+                            $iFrameHtml .= ' ' . $attribute . '=' . $value;
+                        }
+                    }
+                    $iFrameHtml .= ' src="'.DOKU_URL.'lib/plugins/webcode/show.php?id='.$ID.'&web_code_id='.$web_code_id.'" ></iframe>';//
+
+
+                    $renderer->doc .= '<div>' . $this->addJsFiddleButton($this->codes,$this->attributes) . $iFrameHtml . '</div>';
 
 
                     break;
