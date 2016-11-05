@@ -306,9 +306,9 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
             '<div class="webcodeButton">' .
             '<form method="post" action="' . $postURL . '" target="_blank">' .
             '<input type="hidden" name="title" value="Title">' .
-            '<input type="hidden" name="css" value="' . $codes['css'] . '">' .
-            '<input type="hidden" name="html" value="' . $codes['html'] . '">' .
-            '<input type="hidden" name="js" value="' . $codes['javascript'] . '">' .
+            '<input type="hidden" name="css" value="' . htmlentities($codes['css']) . '">' .
+            '<input type="hidden" name="html" value="' . htmlentities($codes['html']) . '">' .
+            '<input type="hidden" name="js" value="' . htmlentities($codes['javascript']) . '">' .
             '<input type="hidden" name="wrap" value="b">' .  //javascript no wrap in body
             $externalResourcesInput.
             '<button class="btn btn-link">' . $this->getLang('JsFiddleButtonContent') . '</button>' .
