@@ -16,7 +16,7 @@ require_once(DOKU_PLUGIN.'action.php');
 class action_plugin_webcode extends DokuWiki_Action_Plugin {
 
     /**
-     * register the eventhandlers
+     * register the event handlers
      *
      * @author Nicolas GERARD
      */
@@ -27,7 +27,7 @@ class action_plugin_webcode extends DokuWiki_Action_Plugin {
     function handle_toolbar(&$event, $param) {
         $webCodeShortcutKey = $this->getConf('WebCodeShortCutKey');
 
-        // hieght = 55px is the height of a single line text
+        // height = 55px is the height of a single line text
         $event->data[] = array(
             'type'   => 'format',
             'title'  => $this->getLang('WebCodeButtonTitle').' ('.$this->getLang('AccessKey').': '.$webCodeShortcutKey.')',
