@@ -294,7 +294,14 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
         // From http://doc.jsfiddle.net/api/post.html
         $postURL = "https://jsfiddle.net/api/post/library/pure/"; //No Framework
         if (array_key_exists('javascript', $this->codes)) {
-            $postURL = "http://jsfiddle.net/api/post/jQuery/2.1.3/";
+            $postURL = "http://jsfiddle.net/api/post/jQuery/";
+            if ($this->useConsole){
+                // If their is a console.log function, add the Firebug Lite support of JsFiddle
+                // Seems to work only with the Edge version of jQuery
+                $postURL .= "Edge/dependencies/Lite/";
+            } else {
+                $postURL .= '2.1.3';
+            }
         }
 
         $externalResourcesInput = '';
