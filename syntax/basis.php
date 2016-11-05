@@ -298,7 +298,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
             if ($this->useConsole){
                 // If their is a console.log function, add the Firebug Lite support of JsFiddle
                 // Seems to work only with the Edge version of jQuery
-                $postURL .= "Edge/dependencies/Lite/";
+                $postURL .= "edge/dependencies/Lite/";
             } else {
                 $postURL .= '2.1.3';
             }
