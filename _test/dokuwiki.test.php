@@ -3,6 +3,9 @@
 /**
  * Tests over DokuWiki function for the Webcode plugin
  *
+ * Most of the test are cache test that are no more used
+ * They are still there for documentation purpose
+ *
  * @group plugin_webcode
  * @group plugins
  */

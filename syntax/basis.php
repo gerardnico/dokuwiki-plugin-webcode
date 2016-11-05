@@ -251,13 +251,6 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     }
                     $htmlContent .= '</body></html>';
 
-                    // Saving the content in the cache
-                    $web_code_id=hash('md5',$htmlContent);
-                    global $ID;
-
-                    $cache = new cache($ID.$web_code_id, '.webcode');
-                    $cache->storeCache($htmlContent);
-
                     // Here the magic from the plugin happens
                     // We add the Iframe and the JsFiddleButton
                     $iFrameHtml = '<iframe name="WebCode iFrame"';
@@ -269,7 +262,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                             $iFrameHtml .= ' ' . $attribute . '=' . $value;
                         }
                     }
-                    $iFrameHtml .= ' src="'.DOKU_URL.'lib/plugins/webcode/show.php?id='.$ID.'&web_code_id='.$web_code_id.'" ></iframe>';//
+                    $iFrameHtml .= ' srcdoc="'.htmlentities($htmlContent).'" ></iframe>';//
 
 
                     $renderer->doc .= '<div>' . $this->addJsFiddleButton($this->codes,$this->attributes) . $iFrameHtml . '</div>';

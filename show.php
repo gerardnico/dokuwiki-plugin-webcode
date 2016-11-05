@@ -1,5 +1,10 @@
 <?php
 //
+// Deprecated
+//
+// Was one used to retrieve the HTML data from the cache
+// Is nog there for History purpose
+//
 // A file that permits to create an URL for the IFrame in order to serve
 // the file created with the code
 //
