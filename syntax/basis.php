@@ -256,7 +256,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     $iFrameHtml = '<iframe name="WebCode iFrame"';
 
                     // We add the HTML attributes
-                    $iFrameHtmlAttributes = array('width', 'height', 'frameborder');
+                    $iFrameHtmlAttributes = array('width', 'height', 'frameborder', 'scrolling');
                     foreach ($this->attributes as $attribute => $value) {
                         if (in_array($attribute, $iFrameHtmlAttributes)) {
                             $iFrameHtml .= ' ' . $attribute . '=' . $value;
@@ -293,7 +293,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                 // Seems to work only with the Edge version of jQuery
                 $postURL .= "edge/dependencies/Lite/";
             } else {
-                $postURL .= '2.1.3';
+                $postURL .= '2.1.3/'; // The end backslash is required in the JSFiddle URL scheme.
             }
         }
 

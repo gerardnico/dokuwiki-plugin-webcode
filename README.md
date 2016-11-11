@@ -64,6 +64,7 @@ The allowed webcode attributes are:
       * frameborder (default to 0)
       * width (default to 100%)
       * height
+      * scrolling
    * externalResources: a comma separated list of external resources. (Ie an URL of a Css or Js file, generally a CDN)
 
 
