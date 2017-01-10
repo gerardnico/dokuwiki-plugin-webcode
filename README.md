@@ -34,7 +34,7 @@ Install the plugin using:
 
 ```xml
 
-<webcode width=100% frameborder=0 height=250px externalResources="//d3js.org/d3.v3.min.js,https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<webcode name="A Name" width=100% frameborder=0 height=250px externalResources="//d3js.org/d3.v3.min.js,https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 
     <!-- wiki syntax with css or html block code. -->
     Full dokuwiki syntax are permitted between blocks
@@ -61,6 +61,7 @@ Install the plugin using:
 The allowed webcode attributes are:
 
    * the following attributes of the [iframe element](https://docs.webplatform.org/wiki/html/elements/iframe)
+      * name. It will be added as a suffix
       * frameborder (default to 0)
       * width (default to 100%)
       * height
@@ -89,3 +90,11 @@ Technically, the plugin:
   * extracts the html, css and javascript code,
   * adds after the last webcode tag an [iframe](https://docs.webplatform.org/wiki/html/elements/iframe),
   * and a button that permits to play with the code on [JsFiddle](https://jsfiddle.net)
+
+
+## Changes
+### 2017-10-1
+  * Two block of the same code are now concatenated
+  * Jquery is no more used. It was used for the javascript part of the console functionality.
+  * XML is now seen as HTML
+  * The ''name'' 

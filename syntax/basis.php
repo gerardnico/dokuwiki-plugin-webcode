@@ -111,34 +111,40 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                 // Does the javascript contains a console statement
                 $useConsole = false;
 
-                // Regexp Pattern to parse all attributes
+                // Regexp Pattern to parse the codes block
                 $codePattern = "\<code\\s*(\\w+)\\s*\>(.+?)\<\/code\>";
                 $result = preg_match_all('/' . $codePattern . '/is', $match, $matches, PREG_PATTERN_ORDER);
                 if ($result != 0) {
+
+                    // Loop through the block codes
                     foreach ($matches[1] as $key => $codeName) {
 
+                        // Get the values
                         $code = $matches[2][$key];
-                        $codes[strtolower($codeName)] = $code;
+                        $lowerCodeName = strtolower($codeName);
 
-                        // Check if javascript contains a console function
-                        if (strtolower($codeName) == 'javascript') {
-                            // if the code contains 'console.'
-                            $result = preg_match('/' . 'console.' . '/is', $code);
-                            if ($result) {
-                                $useConsole = true;
-                            } else {
-                                $useConsole = false;
-                            }
-
+                        // Xml is html
+                        if ($lowerCodeName == 'xml') {
+                            $lowerCodeName == 'html';
                         }
-                    }
-                }
 
-                // If their is xml without html code, xml becomes html code
-                if (!array_key_exists('html', $codes)) {
-                    if (array_key_exists('xml', $codes)) {
-                        $codes['html'] = $codes['xml'];
-                        unset($codes['xml']);
+                        // If the code doesn't exist in the array, index it otherwise append it
+                        if (!array_key_exists($lowerCodeName, $codes)) {
+                            $codes[$lowerCodeName] = $code;
+                        } else {
+                            $codes[$lowerCodeName] = $codes[$lowerCodeName] . $code;
+                        }
+
+                        // Check if a javascript console function is used, only if the flag is not set to true
+                        if (!$useConsole == true) {
+                            if (in_array($lowerCodeName, array('javascript', 'html', 'xml'))) {
+                                // if the code contains 'console.'
+                                $result = preg_match('/' . 'console\.' . '/is', $code);
+                                if ($result) {
+                                    $useConsole = true;
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -215,12 +221,6 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                         }
                     }
 
-                    // Jquery ?
-                    if (array_key_exists('javascript', $this->codes)) {
-                        // JQuery is used for the console facility
-                        $htmlContent .= '<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.3.min.js"></script>';
-                    }
-
                     // WebConsole style sheet
                     if ($this->useConsole) {
                         $htmlContent .= '<link rel="stylesheet" type="text/css" href="' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.css"></link>';
@@ -253,19 +253,26 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
                     // Here the magic from the plugin happens
                     // We add the Iframe and the JsFiddleButton
-                    $iFrameHtml = '<iframe name="WebCode iFrame"';
+                    $iFrameHtml = '<iframe ';
 
-                    // We add the HTML attributes
+                    // We add the name HTML attribute
+                    $name = "WebCode iFrame";
+                    if (array_key_exists('name', $this->attributes)) {
+                        $name .= ' ' . $this->attributes['name'];
+                    }
+                    $iFrameHtml .= ' name="' . $name . '" ';
+
+                    // We add the others HTML attributes
                     $iFrameHtmlAttributes = array('width', 'height', 'frameborder', 'scrolling');
                     foreach ($this->attributes as $attribute => $value) {
                         if (in_array($attribute, $iFrameHtmlAttributes)) {
                             $iFrameHtml .= ' ' . $attribute . '=' . $value;
                         }
                     }
-                    $iFrameHtml .= ' srcdoc="'.htmlentities($htmlContent).'" ></iframe>';//
+                    $iFrameHtml .= ' srcdoc="' . htmlentities($htmlContent) . '" ></iframe>';//
 
-
-                    $renderer->doc .= '<div>' . $this->addJsFiddleButton($this->codes,$this->attributes) . $iFrameHtml . '</div>';
+                    // Add the JsFiddle button
+                    $renderer->doc .= '<div>' . $this->addJsFiddleButton($this->codes, $this->attributes) . $iFrameHtml . '</div>';
 
 
                     break;
@@ -281,14 +288,14 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
      * @param $attributes the attributes of a call (for now the externalResources)
      * @return string the HTML form code
      */
-    public function addJsFiddleButton($codes,$attributes)
+    public function addJsFiddleButton($codes, $attributes)
     {
 
         // From http://doc.jsfiddle.net/api/post.html
         $postURL = "https://jsfiddle.net/api/post/library/pure/"; //No Framework
         if (array_key_exists('javascript', $this->codes)) {
             $postURL = "http://jsfiddle.net/api/post/jQuery/";
-            if ($this->useConsole){
+            if ($this->useConsole) {
                 // If their is a console.log function, add the Firebug Lite support of JsFiddle
                 // Seems to work only with the Edge version of jQuery
                 $postURL .= "edge/dependencies/Lite/";
@@ -298,8 +305,8 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
         }
 
         $externalResourcesInput = '';
-        if (array_key_exists(self::EXTERNAL_RESOURCES_ATTRIBUTE,$attributes)){
-            $externalResourcesInput = '<input type="hidden" name="resources" value="'.$attributes[self::EXTERNAL_RESOURCES_ATTRIBUTE]. '">';
+        if (array_key_exists(self::EXTERNAL_RESOURCES_ATTRIBUTE, $attributes)) {
+            $externalResourcesInput = '<input type="hidden" name="resources" value="' . $attributes[self::EXTERNAL_RESOURCES_ATTRIBUTE] . '">';
         }
 
         $jsFiddleButtonHtmlCode =
@@ -310,7 +317,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
             '<input type="hidden" name="html" value="' . htmlentities($codes['html']) . '">' .
             '<input type="hidden" name="js" value="' . htmlentities($codes['javascript']) . '">' .
             '<input type="hidden" name="wrap" value="b">' .  //javascript no wrap in body
-            $externalResourcesInput.
+            $externalResourcesInput .
             '<button class="btn btn-link">' . $this->getLang('JsFiddleButtonContent') . '</button>' .
             '</form>' .
             '</div>';
@@ -324,7 +331,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
      * @param $attributes the attributes of a call (for now the externalResources)
      * @return string the HTML form code
      */
-    public function addCodePenButton($codes,$attributes)
+    public function addCodePenButton($codes, $attributes)
     {
         // TODO
         // http://blog.codepen.io/documentation/api/prefill/

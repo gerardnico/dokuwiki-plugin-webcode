@@ -9,11 +9,16 @@
 // is used in order to redirect the output in the HTML page
 // in a div container
 
-var consoleLine = "<p class=\"webCodeConsoleLine\"></p>";
 
 console = {
+
+    webConsole: document.querySelector("#webCodeConsole"),
     log: function (text) {
-        $("#webCodeConsole").append($(consoleLine).html(text));
+        var webConsoleLine = document.createElement("p");
+        webConsoleLine.className = "webCodeConsoleLine";
+        webConsoleLine.innerHTML = text;
+        this.webConsole.appendChild(webConsoleLine);
     }
+
 };
 
