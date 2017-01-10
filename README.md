@@ -78,8 +78,6 @@ The actual [code blocks](https://www.dokuwiki.org/wiki:syntax#code_blocks) suppo
 
 ## Javascript
 
-Jquery version 2.1.3 is also by default added if a javascript block is present with the following CDN URL (http://code.jquery.com/jquery-2.1.3.min.js).
-
 The [console.log function](https://developer.mozilla.org/en-US/docs/Web/API/Console/log) will be rendered and therefore visible in a console area (Gray box).
 
 ## Technically
