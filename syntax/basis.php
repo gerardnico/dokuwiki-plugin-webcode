@@ -240,7 +240,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                         $htmlContent .= '<!-- WebCode Console -->';
                         $htmlContent .= '<div><p class=\'webConsoleTitle\'>Console Output:</p>';
                         $htmlContent .= '<div id=\'webCodeConsole\'></div>';
-                        $htmlContent .= '<script type=\'text/javascript\' src=\'' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.js\'></script>';
+                        $htmlContent .= '<script type=\'text/javascript\' src=\'' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole2.js\'></script>';
                         $htmlContent .= '</div>';
                     }
                     // The javascript comes at the end because it may want to be applied on previous HTML element
