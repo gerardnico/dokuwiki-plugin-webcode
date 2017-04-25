@@ -20,7 +20,7 @@ See the plugin in action [here](http://gerardnico.com/wiki/dokuwiki/webcode).
 
 ## Illustration
 
-![The illustration](https://github.com/gerardnico/dokuwiki-plugin-webcode/blob/master/images/webcode_plugin_illustration.png "Webcode Illustration")
+![The illustration](images/webcode_plugin_illustration.png "Webcode Illustration")
 
 ## Installation
 
