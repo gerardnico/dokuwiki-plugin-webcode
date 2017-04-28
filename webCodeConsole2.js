@@ -14,9 +14,10 @@ console = {
 
     webConsole: document.querySelector("#webCodeConsole"),
     log: function (text) {
+        var ev = String(eval(text))
         var webConsoleLine = document.createElement("p");
         webConsoleLine.className = "webCodeConsoleLine";
-        webConsoleLine.innerHTML = text;
+        webConsoleLine.innerHTML = ev;
         this.webConsole.appendChild(webConsoleLine);
     }
 
