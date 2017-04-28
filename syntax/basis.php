@@ -16,7 +16,8 @@ if (!defined('DOKU_INC')) die();
 class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 {
 
-    const EXTERNAL_RESOURCES_ATTRIBUTE = 'externalresources';
+    const EXTERNAL_RESOURCES_ATTRIBUTE_DISPLAY = 'externalResources'; // In the action bar
+    const EXTERNAL_RESOURCES_ATTRIBUTE_KEY = 'externalresources'; // In the code
 
     /**
      * @var array that holds the iframe attributes
@@ -91,12 +92,12 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                 $attributes['width'] = '100%';
 
                 // /i not case sensitive
-                $attributePattern = "\\s*(\w+)\\s*=\\s*\"?([^\"\s]+)\"?\\s*";
+                $attributePattern = "\s*(\w+)\s*=\s*\"?([^\"\s]+)\"?\\s*";
                 $result = preg_match_all('/' . $attributePattern . '/i', $match, $matches);
 
                 if ($result != 0) {
-                    foreach ($matches[1] as $key => $codeName) {
-                        $attributes[strtolower($codeName)] = $matches[2][$key];
+                    foreach ($matches[1] as $key => $nodeCodeContent) {
+                        $attributes[strtolower($nodeCodeContent)] = $matches[2][$key];
                     }
                 }
 
@@ -112,15 +113,28 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                 $useConsole = false;
 
                 // Regexp Pattern to parse the codes block
-                $codePattern = "\<code\\s*(\\w+)\\s*\>(.+?)\<\/code\>";
+                $codePattern = "\<code\s*(\w+)\s*\>(.+?)\<\/code\>";
                 $result = preg_match_all('/' . $codePattern . '/is', $match, $matches, PREG_PATTERN_ORDER);
                 if ($result != 0) {
 
                     // Loop through the block codes
-                    foreach ($matches[1] as $key => $codeName) {
+                    foreach ($matches[1] as $key => $nodeCodeContent) {
 
-                        // Get the values
+                        // Get the code (The content between the code nodes)
                         $code = $matches[2][$key];
+
+                        // The attributes of the code element
+                        // Example:<code javascript type="text/babel">
+                        $firstSpace = strpos($nodeCodeContent, " ");
+                        // If there is a space, there is may be attributes
+                        if ($firstSpace) {
+                            $codeName = substr($nodeCodeContent, 0, $firstSpace);
+                        } else {
+                            // There is no attributes, this is the code name
+                            $codeName = $nodeCodeContent;
+                        }
+
+                        // String are in lowercase
                         $lowerCodeName = strtolower($codeName);
 
                         // Xml is html
@@ -204,22 +218,32 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     $htmlContent .= '<title>Made by Webcode</title>';
                     $htmlContent .= '<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css">';
 
+
                     // External Resources such as css stylesheet or js
-                    if (array_key_exists(self::EXTERNAL_RESOURCES_ATTRIBUTE, $this->attributes)) {
-                        $externalResources = explode(",", $this->attributes[self::EXTERNAL_RESOURCES_ATTRIBUTE]);
-                        foreach ($externalResources as $externalResource) {
-                            $pathInfo = pathinfo($externalResource);
-                            $fileExtension = $pathInfo['extension'];
-                            switch ($fileExtension) {
-                                case 'css':
-                                    $htmlContent .= '<link rel="stylesheet" type="text/css" href="' . $externalResource . '">';
-                                    break;
-                                case 'js':
-                                    $htmlContent .= '<script type="text/javascript" src="' . $externalResource . '"></script>';
-                                    break;
-                            }
+                    $externalResources = array();
+                    if (array_key_exists(self::EXTERNAL_RESOURCES_ATTRIBUTE_KEY, $this->attributes)) {
+                        $externalResources = explode(",", $this->attributes[self::EXTERNAL_RESOURCES_ATTRIBUTE_KEY]);
+                    }
+
+                    // Babel Preprocessor, if babel is used, add it to the external resources
+                    if (array_key_exists('babel', $this->codes)) {
+                        $externalResources[] = "https://unpkg.com/babel-standalone@6/babel.min.js";
+                    }
+
+                    // Add the external resources
+                    foreach ($externalResources as $externalResource) {
+                        $pathInfo = pathinfo($externalResource);
+                        $fileExtension = $pathInfo['extension'];
+                        switch ($fileExtension) {
+                            case 'css':
+                                $htmlContent .= '<link rel="stylesheet" type="text/css" href="' . $externalResource . '">';
+                                break;
+                            case 'js':
+                                $htmlContent .= '<script type="text/javascript" src="' . $externalResource . '"></script>';
+                                break;
                         }
                     }
+
 
                     // WebConsole style sheet
                     if ($this->useConsole) {
@@ -247,7 +271,11 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     // as the page load in the IO order, javascript must be placed at the end
                     if (array_key_exists('javascript', $this->codes)) {
                         $htmlContent .= '<!-- The Javascript code -->';
-                        $htmlContent .= '<script>' . $this->codes['javascript'] . '</script>';
+                        $htmlContent .= '<script type="text/javascript">' . $this->codes['javascript'] . '</script>';
+                    }
+                    if (array_key_exists('babel', $this->codes)) {
+                        $htmlContent .= '<!-- The Babel code -->';
+                        $htmlContent .= '<script type="text/babel">' . $this->codes['babel'] . '</script>';
                     }
                     $htmlContent .= '</body></html>';
 
@@ -294,7 +322,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
         // From http://doc.jsfiddle.net/api/post.html
         $postURL = "https://jsfiddle.net/api/post/library/pure/"; //No Framework
         if (array_key_exists('javascript', $this->codes)) {
-            $postURL = "http://jsfiddle.net/api/post/jQuery/";
+            $postURL = "https://jsfiddle.net/api/post/jQuery/";
             if ($this->useConsole) {
                 // If their is a console.log function, add the Firebug Lite support of JsFiddle
                 // Seems to work only with the Edge version of jQuery
@@ -305,8 +333,15 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
         }
 
         $externalResourcesInput = '';
-        if (array_key_exists(self::EXTERNAL_RESOURCES_ATTRIBUTE, $attributes)) {
-            $externalResourcesInput = '<input type="hidden" name="resources" value="' . $attributes[self::EXTERNAL_RESOURCES_ATTRIBUTE] . '">';
+        if (array_key_exists(self::EXTERNAL_RESOURCES_ATTRIBUTE_KEY, $attributes)) {
+            $externalResourcesInput = '<input type="hidden" name="resources" value="' . $attributes[self::EXTERNAL_RESOURCES_ATTRIBUTE_KEY] . '">';
+        }
+
+        $jsCode = $codes['javascript'];
+        $jsPanel = 0; // language for the js specific panel (0 = JavaScript)
+        if (array_key_exists('babel',$codes)) {
+            $jsCode = $codes['babel'];
+            $jsPanel = 3; // 3 = Babel
         }
 
         $jsFiddleButtonHtmlCode =
@@ -315,7 +350,8 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
             '<input type="hidden" name="title" value="Title">' .
             '<input type="hidden" name="css" value="' . htmlentities($codes['css']) . '">' .
             '<input type="hidden" name="html" value="' . htmlentities($codes['html']) . '">' .
-            '<input type="hidden" name="js" value="' . htmlentities($codes['javascript']) . '">' .
+            '<input type="hidden" name="js" value="' . htmlentities($jsCode) . '">' .
+            '<input type="hidden" name="panel_js" value="' . htmlentities($jsPanel) . '">' .
             '<input type="hidden" name="wrap" value="b">' .  //javascript no wrap in body
             $externalResourcesInput .
             '<button class="btn btn-link">' . $this->getLang('JsFiddleButtonContent') . '</button>' .

@@ -6,7 +6,7 @@ The [Webcode Dokuwiki plugin](https://www.dokuwiki.org/plugin:webcode)  renders 
 
   * CSS
   * HTML
-  * and [Javascript](#javascript)
+  * [Javascript](#javascript) or [Babel](#babel)
 
 code block.
 
@@ -51,8 +51,8 @@ Install the plugin using:
     <code xml>
     </code>
 
-    <!-- javascript code block -->
-    <code javascript>
+    <!-- javascript or babel code block -->
+    <code javascript> <!-- or <code babel> -->
     </code>
 
 </webcode>
@@ -73,12 +73,20 @@ The actual [code blocks](https://www.dokuwiki.org/wiki:syntax#code_blocks) suppo
 
   * code html (or code xml if html is not present). Xml will be seen as XHTML.
   * code css
-  * code javascript
+  * code javascript or babel (but not both)
 
 
-## Javascript
+## Language Support
+### Javascript
 
 The [console.log function](https://developer.mozilla.org/en-US/docs/Web/API/Console/log) will be rendered and therefore visible in a console area (Gray box).
+
+### Babel
+
+When a code block use [Babel](https://babeljs.io/) as language, the plugin will add the 
+[babel.min.js](https://unpkg.com/babel-standalone@6/babel.min.js) version 6 to the external resources.
+
+You cannot have a Babel and a Javascript Block.
 
 ## Technically
 
@@ -91,6 +99,9 @@ Technically, the plugin:
 
 
 ## Changes
+### 2017-04-28
+  * Added [Babel](https://babeljs.io/) support
+  * Bugs (Https call to Fiddle and externalAttributes Resources in the action bar)
 ### 2017-10-1
   * Two block of the same code are now concatenated
   * Jquery is no more used. It was used for the javascript part of the console functionality.
