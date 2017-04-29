@@ -16,9 +16,11 @@ console = {
 
     webConsole: document.querySelector("#webCodeConsole"),
     log: function (input) {
+        s = String(input);
+        s = s.replace('\n','<BR>')
         var webConsoleLine = document.createElement("p");
         webConsoleLine.className = "webCodeConsoleLine";
-        webConsoleLine.innerHTML = String(input);
+        webConsoleLine.innerHTML = s;
         this.webConsole.appendChild(webConsoleLine);
     }
 
