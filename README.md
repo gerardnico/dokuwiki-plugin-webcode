@@ -102,6 +102,7 @@ Technically, the plugin:
 ### 2017-04-28
   * Added [Babel](https://babeljs.io/) support
   * Bugs (Https call to Fiddle and externalAttributes Resources in the action bar)
+  * Cache bursting implementation for the weCodeConsole.(js|css) file so that they are not cached for an new version.
 ### 2017-10-1
   * Two block of the same code are now concatenated
   * Jquery is no more used. It was used for the javascript part of the console functionality.
