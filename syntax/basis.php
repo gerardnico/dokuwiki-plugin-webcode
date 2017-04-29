@@ -144,7 +144,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
                         // Xml is html
                         if ($lowerCodeName == 'xml') {
-                            $lowerCodeName == 'html';
+                            $lowerCodeName = 'html';
                         }
 
                         // If the code doesn't exist in the array, index it otherwise append it
