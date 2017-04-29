@@ -9,6 +9,8 @@
 // is used in order to redirect the output in the HTML page
 // in a div container
 
+// Don't forget to increment the version number in the CONSTANT WEB_CONSOLE_JS_VERSION of basis.php
+
 
 console = {
 

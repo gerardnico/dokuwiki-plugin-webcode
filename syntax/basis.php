@@ -19,6 +19,11 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
     const EXTERNAL_RESOURCES_ATTRIBUTE_DISPLAY = 'externalResources'; // In the action bar
     const EXTERNAL_RESOURCES_ATTRIBUTE_KEY = 'externalresources'; // In the code
 
+    // Simple cache bursting implementation for the webCodeConsole.(js|css) file
+    // They must be incremented manually when they changed
+    const WEB_CONSOLE_CSS_VERSION = 1.0;
+    const WEB_CONSOLE_JS_VERSION = 1.0;
+
     /**
      * @var array that holds the iframe attributes
      */
@@ -247,7 +252,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
                     // WebConsole style sheet
                     if ($this->useConsole) {
-                        $htmlContent .= '<link rel="stylesheet" type="text/css" href="' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.css"></link>';
+                        $htmlContent .= '<link rel="stylesheet" type="text/css" href="' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.css?ver='.self::WEB_CONSOLE_CSS_VERSION.'"></link>';
                     }
 
                     if (array_key_exists('css', $this->codes)) {
@@ -264,7 +269,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                         $htmlContent .= '<!-- WebCode Console -->';
                         $htmlContent .= '<div><p class=\'webConsoleTitle\'>Console Output:</p>';
                         $htmlContent .= '<div id=\'webCodeConsole\'></div>';
-                        $htmlContent .= '<script type=\'text/javascript\' src=\'' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole2.js\'></script>';
+                        $htmlContent .= '<script type=\'text/javascript\' src=\'' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.js?ver='.self::WEB_CONSOLE_JS_VERSION.'\'></script>';
                         $htmlContent .= '</div>';
                     }
                     // The javascript comes at the end because it may want to be applied on previous HTML element
