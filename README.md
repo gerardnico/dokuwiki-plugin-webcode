@@ -104,6 +104,7 @@ Technically, the plugin:
   * Bugs (Https call to Fiddle in place of Http, externalAttributes Resources in the action bar in place of include, Xml was not replaced by HTML code)
   * Cache bursting implementation for the weCodeConsole.(js|css) file so that they are not cached for an new version.
   * New lines (\n) are now supported in the javascript console.log function.
+  * Object of one level are now supported in the javascript console.log function.
 ### 2017-10-1
   * Two block of the same code are now concatenated
   * Jquery is no more used. It was used for the javascript part of the console functionality.

@@ -16,8 +16,18 @@ console = {
 
     webConsole: document.querySelector("#webCodeConsole"),
     log: function (input) {
-        s = String(input);
-        s = s.replace('\n','<BR>')
+        if (typeof input == "object") {
+            s="{\n";
+            var keys = Object.keys(input);
+            for (var i = 0; i < keys.length; i++) {
+                // &nbsp; = one space in HTML
+                s+="&nbsp;&nbsp;"+keys[i]+ " : " + input[keys[i]] + ";\n";
+            }
+            s+="}\n";
+        } else {
+            s = String(input);
+        }
+        s = s.replace(/\n/g, '<BR>')
         var webConsoleLine = document.createElement("p");
         webConsoleLine.className = "webCodeConsoleLine";
         webConsoleLine.innerHTML = s;
