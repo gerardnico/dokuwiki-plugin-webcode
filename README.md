@@ -105,6 +105,7 @@ Technically, the plugin:
   * Cache bursting implementation for the weCodeConsole.(js|css) file so that they are not cached for an new version.
   * New lines (\n) are now supported in the javascript console.log function.
   * Object of one level are now supported in the javascript console.log function.
+  * [JSFiddle bug 726](https://github.com/jsfiddle/jsfiddle-issues/issues/726) makes the resources order not consistent. Solution: More than one resources will be then added in the HTML script element.
 ### 2017-10-1
   * Two block of the same code are now concatenated
   * Jquery is no more used. It was used for the javascript part of the console functionality.

@@ -322,11 +322,12 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
      * @param $codes the array containing the codes
      * @param $attributes the attributes of a call (for now the externalResources)
      * @return string the HTML form code
+     *
+     * Specification, see http://doc.jsfiddle.net/api/post.html
      */
     public function addJsFiddleButton($codes, $attributes)
     {
 
-        // From http://doc.jsfiddle.net/api/post.html
         $postURL = "https://jsfiddle.net/api/post/library/pure/"; //No Framework
         if (array_key_exists('javascript', $this->codes)) {
             $postURL = "https://jsfiddle.net/api/post/jQuery/";
@@ -341,7 +342,20 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
         $externalResourcesInput = '';
         if (array_key_exists(self::EXTERNAL_RESOURCES_ATTRIBUTE_KEY, $attributes)) {
-            $externalResourcesInput = '<input type="hidden" name="resources" value="' . $attributes[self::EXTERNAL_RESOURCES_ATTRIBUTE_KEY] . '">';
+            // The below code is to prevent this JsFiddle bug: https://github.com/jsfiddle/jsfiddle-issues/issues/726
+            // The order of the resources is not guaranteed
+            // We pass then the resources only if their is one resources
+            // Otherwise we pass them as a script element in the HTML.
+            $externalResources = explode(",",$attributes[self::EXTERNAL_RESOURCES_ATTRIBUTE_KEY]);
+            if (count($externalResources)<=1) {
+                $externalResourcesInput = '<input type="hidden" name="resources" value="' . $externalResources . '">';
+            } else {
+                $codes['html'] .=  "\n\n<!-- The resources have been added here because their order is not guarantee through the API. -->\n";
+                $codes['html'] .=  "<!-- See: https://github.com/jsfiddle/jsfiddle-issues/issues/726";
+                foreach ($externalResources as $externalResource) {
+                    $codes['html'] .=  "<script src=\"".$externalResource."\"></script>\n";
+                }
+            }
         }
 
         $jsCode = $codes['javascript'];
@@ -351,10 +365,21 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
             $jsPanel = 3; // 3 = Babel
         }
 
+        // Title and description
+        global $ID;
+        $title=$attributes['name'];
+        $pageTitle = tpl_pagetitle($ID, true);
+        if (!$title) {
+
+            $title="Code from ". $pageTitle;
+        }
+        $description="Code from the page '". $pageTitle ."' \n".wl($ID,$absolute=true);
+
         $jsFiddleButtonHtmlCode =
             '<div class="webcodeButton">' .
             '<form method="post" action="' . $postURL . '" target="_blank">' .
-            '<input type="hidden" name="title" value="Title">' .
+            '<input type="hidden" name="title" value="'. htmlentities($title).'">' .
+            '<input type="hidden" name="description" value="'. htmlentities($description).'">' .
             '<input type="hidden" name="css" value="' . htmlentities($codes['css']) . '">' .
             '<input type="hidden" name="html" value="' . htmlentities($codes['html']) . '">' .
             '<input type="hidden" name="js" value="' . htmlentities($jsCode) . '">' .
