@@ -351,7 +351,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                 $externalResourcesInput = '<input type="hidden" name="resources" value="' . $externalResources . '">';
             } else {
                 $codes['html'] .=  "\n\n<!-- The resources have been added here because their order is not guarantee through the API. -->\n";
-                $codes['html'] .=  "<!-- See: https://github.com/jsfiddle/jsfiddle-issues/issues/726";
+                $codes['html'] .=  "<!-- See: https://github.com/jsfiddle/jsfiddle-issues/issues/726 -->\n";
                 foreach ($externalResources as $externalResource) {
                     $codes['html'] .=  "<script src=\"".$externalResource."\"></script>\n";
                 }
