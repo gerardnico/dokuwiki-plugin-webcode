@@ -297,6 +297,9 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     }
                     $iFrameHtml .= ' name="' . $name . '" ';
 
+                    // The class to be able to select them
+                    $iFrameHtml .= ' class="webCode" ';
+
                     // We add the others HTML attributes
                     $iFrameHtmlAttributes = array('width', 'height', 'frameborder', 'scrolling');
                     foreach ($this->attributes as $attribute => $value) {
