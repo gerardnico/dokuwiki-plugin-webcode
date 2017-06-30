@@ -118,7 +118,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                 $useConsole = false;
 
                 // Regexp Pattern to parse the codes block
-                $codePattern = "\<code\s*(\w+)\s*\>(.+?)\<\/code\>";
+                $codePattern = "\<code\s*(\w+)\s*[\w\s\.]*\>(.+?)\<\/code\>";
                 $result = preg_match_all('/' . $codePattern . '/is', $match, $matches, PREG_PATTERN_ORDER);
                 if ($result != 0) {
 
