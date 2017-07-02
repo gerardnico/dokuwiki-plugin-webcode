@@ -22,7 +22,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
     // Simple cache bursting implementation for the webCodeConsole.(js|css) file
     // They must be incremented manually when they changed
     const WEB_CONSOLE_CSS_VERSION = 1.0;
-    const WEB_CONSOLE_JS_VERSION = 1.3;
+    const WEB_CONSOLE_JS_VERSION = 1.4;
 
     /**
      * @var array that holds the iframe attributes
@@ -156,7 +156,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
                         // Check if a javascript console function is used, only if the flag is not set to true
                         if (!$useConsole == true) {
-                            if (in_array($lowerCodeName, array('javascript', 'html', 'xml'))) {
+                            if (in_array($lowerCodeName, array('babel','javascript', 'html', 'xml'))) {
                                 // if the code contains 'console.'
                                 $result = preg_match('/' . 'console\.' . '/is', $code);
                                 if ($result) {

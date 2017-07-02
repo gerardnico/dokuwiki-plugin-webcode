@@ -12,27 +12,22 @@
 // Don't forget to increment the version number in the CONSTANT WEB_CONSOLE_JS_VERSION of basis.php
 
 
-console = {
-
-    webConsole: document.querySelector("#webCodeConsole"),
-    log: function (input) {
-        if (typeof input == "object") {
-            s="{\n";
-            var keys = Object.keys(input);
-            for (var i = 0; i < keys.length; i++) {
-                // &nbsp; = one space in HTML
-                s+="&nbsp;&nbsp;"+keys[i]+ " : " + input[keys[i]] + ";\n";
-            }
-            s+="}\n";
-        } else {
-            s = String(input);
+window.console.log = function (input) {
+    if (typeof input == "object") {
+        s = "{\n";
+        var keys = Object.keys(input);
+        for (var i = 0; i < keys.length; i++) {
+            // &nbsp; = one space in HTML
+            s += "&nbsp;&nbsp;" + keys[i] + " : " + input[keys[i]] + ";\n";
         }
-        s = s.replace(/\n/g, '<BR>')
-        var webConsoleLine = document.createElement("p");
-        webConsoleLine.className = "webCodeConsoleLine";
-        webConsoleLine.innerHTML = s;
-        this.webConsole.appendChild(webConsoleLine);
+        s += "}\n";
+    } else {
+        s = String(input);
     }
-
+    s = s.replace(/\n/g, '<BR>')
+    var webConsoleLine = document.createElement("p");
+    webConsoleLine.className = "webCodeConsoleLine";
+    webConsoleLine.innerHTML = s;
+    document.querySelector("#webCodeConsole").appendChild(webConsoleLine);
 };
 
