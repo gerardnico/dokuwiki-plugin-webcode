@@ -234,7 +234,11 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
                     // Babel Preprocessor, if babel is used, add it to the external resources
                     if (array_key_exists('babel', $this->codes)) {
-                        $externalResources[] = "https://unpkg.com/babel-standalone@6/babel.min.js";
+                        $babelMin = "https://unpkg.com/babel-standalone@6/babel.min.js";
+                        // a load of babel invoke it (be sure to not have it twice
+                        if (!(array_key_exists($babelMin,$externalResources))) {
+                            $externalResources[] = $babelMin;
+                        }
                     }
 
                     // Add the external resources
