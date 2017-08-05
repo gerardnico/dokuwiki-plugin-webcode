@@ -22,7 +22,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
     // Simple cache bursting implementation for the webCodeConsole.(js|css) file
     // They must be incremented manually when they changed
     const WEB_CONSOLE_CSS_VERSION = 1.0;
-    const WEB_CONSOLE_JS_VERSION = 1.4;
+    const WEB_CONSOLE_JS_VERSION = 1.5;
 
     /**
      * @var array that holds the iframe attributes

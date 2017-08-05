@@ -99,6 +99,8 @@ Technically, the plugin:
 
 
 ## Changes
+### 2017-08-05
+  * The 's' variable leaked from the window.console.log function of the webCodeConsole.js
 ### 2017-06-07
   * The height of the Iframe is now dynamically calculated. No need to give this attribute anymore if you want to see the whole output.
 ### 2017-04-28

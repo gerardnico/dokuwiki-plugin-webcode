@@ -14,7 +14,7 @@
 
 window.console.log = function (input) {
     if (typeof input == "object") {
-        s = "{\n";
+        var s = "{\n";
         var keys = Object.keys(input);
         for (var i = 0; i < keys.length; i++) {
             // &nbsp; = one space in HTML
