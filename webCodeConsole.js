@@ -20,6 +20,27 @@ var WEBCODE = {
     },
     appendChild: function (element) {
         document.querySelector("#webCodeConsole").appendChild(element);
+    },
+    print: function (v) {
+        if (typeof v == 'undefined') {
+            return "(Undefined)"; // Undefined == null, therefore it must be in first position
+        } else if (Array.isArray(v)) {
+            if (v.length == 0) {
+                return "(Empty Array)";
+            } else {
+                return v;
+            }
+        } else if (typeof v == 'string') {
+            if (v.length == 0) {
+                return "(Empty String)"
+            } else {
+                return v;
+            }
+        } else if (v == null) {
+            return "(null)";
+        } else {
+            return v;
+        }
     }
 }
 
@@ -72,10 +93,10 @@ window.console.table = function (input) {
                 // First iteration, we pick the headers
                 if (i == 0) {
 
-                    if (typeof input[0] == 'object') {
+                    if (typeof element == 'object') {
                         for (prop in element) {
                             var thElement = document.createElement("th");
-                            thElement.innerHTML = prop;
+                            thElement.innerHTML = WEBCODE.print(prop);
                             trElement.appendChild(thElement);
                         }
                     } else {
@@ -93,12 +114,12 @@ window.console.table = function (input) {
                 if (typeof input[0] == 'object') {
                     for (prop in element) {
                         var tdElement = tdElement.cloneNode(false);
-                        tdElement.innerHTML = element[prop];
+                        tdElement.innerHTML = WEBCODE.print(element[prop]);
                         trElement.appendChild(tdElement);
                     }
                 } else {
                     var tdElement = tdElement.cloneNode(false);
-                    tdElement.innerHTML = element.toString();
+                    tdElement.innerHTML = WEBCODE.print(element);
                     trElement.appendChild(tdElement);
                 }
 
