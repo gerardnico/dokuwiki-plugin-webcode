@@ -77,9 +77,10 @@ The actual [code blocks](https://www.dokuwiki.org/wiki:syntax#code_blocks) suppo
 
 
 ## Language Support
-### Javascript
+### Javascript Console
 
-The [console.log function](https://developer.mozilla.org/en-US/docs/Web/API/Console/log) will be rendered and therefore visible in a console area (Gray box).
+  * The [console.log function](https://developer.mozilla.org/en-US/docs/Web/API/Console/log) will be rendered and therefore visible in a console area (Gray box).
+  * The [console.table function](https://developer.mozilla.org/en-US/docs/Web/API/Console/table) is supported only for a collection of objects or primitives. There is no second argument.
 
 ### Babel
 
@@ -100,6 +101,7 @@ Technically, the plugin:
 
 ## Changes
 ### 2017-08-05
+  * The 'console.table' function is partially supported
   * The 's' variable leaked from the window.console.log function of the webCodeConsole.js
 ### 2017-06-07
   * The height of the Iframe is now dynamically calculated. No need to give this attribute anymore if you want to see the whole output.

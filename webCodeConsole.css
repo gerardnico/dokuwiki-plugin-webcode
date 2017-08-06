@@ -32,3 +32,19 @@ body {
     margin-bottom: 4px;
     font-weight: bold;
 }
+
+table>thead>tr>th:first-letter {
+    text-transform:capitalize;
+}
+
+table>tbody>tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+}
+
+table>tbody>tr:nth-of-type(even) {
+    background-color: #d8d7d7;
+}
+
+td, th {
+    padding: 0.5rem;
+}
