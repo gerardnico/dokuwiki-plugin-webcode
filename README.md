@@ -67,6 +67,9 @@ The allowed webcode attributes are:
       * height
       * scrolling
    * externalResources: a comma separated list of external resources. (Ie an URL of a Css or Js file, generally a CDN)
+   * renderingMode: 
+      * story (default): The rendering will output the content inside the `webcode` elements and add the result after the closing `webcode` code.
+      * onlyResult: The rendering will **suppress** the content inside the `webcode` elements and will show only the result after the closing `webcode` code.
 
 
 The actual [code blocks](https://www.dokuwiki.org/wiki:syntax#code_blocks) supported are:
@@ -100,6 +103,10 @@ Technically, the plugin:
 
 
 ## Changes
+### 2017-10-22
+  * Added a `renderingMode` argument to be able to show only the result
+  * Added a promotion link
+  * The links are now after the result.
 ### 2017-08-05
   * The 'console.table' function is partially supported
   * The 's' variable leaked from the window.console.log function of the webCodeConsole.js
