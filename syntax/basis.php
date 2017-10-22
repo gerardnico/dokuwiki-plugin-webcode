@@ -335,11 +335,11 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     $iFrameHtml .= ' srcdoc="' . htmlentities($htmlContent) . '" ></iframe>';//
 
                     //
-                    $poweredBy = '<div class="webcodeButton"><a href="https://gerardnico.com/wiki/dokuwiki/webcode" class="btn btn-link">Powered by Webcode</a></div>';
-                    $createdBy = '<div class="webcodeButton"><a href="https://gerardnico.com/" class="btn btn-link">Made with &#10084; by Nico</a></div>';
+                    $poweredBy = '<div class="webcodeButton"><a href="https://gerardnico.com/wiki/dokuwiki/webcode" class="btn btn-link">'.$this->getLang('RenderedBy').'</a></div>';
+                    $createdBy = '<div class="webcodeButton"><a href="https://gerardnico.com/" class="btn btn-link">'.$this->getLang('MadeWithLoveBy').'</a></div>';
 
                     // Add the JsFiddle button
-                    $renderer->doc .= '<div class="webCode">'. $iFrameHtml . $createdBy . $poweredBy . $this->addJsFiddleButton($this->codes, $this->attributes) .'</div>';
+                    $renderer->doc .= '<div class="webCode">'. $iFrameHtml . $poweredBy . $createdBy . $this->addJsFiddleButton($this->codes, $this->attributes) .'</div>';
 
 
                     break;
