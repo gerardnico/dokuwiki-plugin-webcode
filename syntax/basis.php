@@ -355,7 +355,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
             // Otherwise we pass them as a script element in the HTML.
             $externalResources = explode(",",$attributes[self::EXTERNAL_RESOURCES_ATTRIBUTE_KEY]);
             if (count($externalResources)<=1) {
-                $externalResourcesInput = '<input type="hidden" name="resources" value="' . $externalResources . '">';
+                $externalResourcesInput = '<input type="hidden" name="resources" value="' . implode(",", $externalResources) . '">';
             } else {
                 $codes['html'] .=  "\n\n<!-- The resources have been added here because their order is not guarantee through the API. -->\n";
                 $codes['html'] .=  "<!-- See: https://github.com/jsfiddle/jsfiddle-issues/issues/726 -->\n";
