@@ -12,7 +12,7 @@ window.addEventListener("load", function(event) {
             var webCodeIFrame = webCodeIFrames[i];
             var height = webCodeIFrame.getAttribute('height');
             if (height == null) {
-                webCodeIFrame.height = webCodeIFrame.contentWindow.document.querySelector("html").scrollHeight
+                webCodeIFrame.height = webCodeIFrame.contentWindow.document.querySelector("html").offsetHeight
             }
         }
     }
