@@ -98,7 +98,9 @@ Technically, the plugin:
   * adds after the last webcode tag an [iframe](https://docs.webplatform.org/wiki/html/elements/iframe),
   * and a button that permits to play with the code on [JsFiddle](https://jsfiddle.net)
 
-
+## Road map
+  *  More language with [sphere-engine](https://developer.sphere-engine.com/api/compilers)
+  
 ## Changes
 ### 2017-08-05
   * The 'console.table' function is partially supported
