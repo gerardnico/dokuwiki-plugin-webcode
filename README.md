@@ -107,16 +107,28 @@ Technically, the plugin:
      * or [codingground](https://www.tutorialspoint.com/codingground.htm)
   
 ## Changes
+
+### 2019-02-06
+
+  * To be able to see the output of a `console.log` javascript statement in JsFiddle, the firebug resources have been added (The JsFiddle feature was broken)
+  * New publication date on Dokuwiki
+   
 ### 2017-10-22
+
   * Added a `renderingMode` argument to be able to show only the result
   * Added a promotion link
   * The links are now after the result.
 ### 2017-08-05
+
   * The 'console.table' function is partially supported
   * The 's' variable leaked from the window.console.log function of the webCodeConsole.js
+
 ### 2017-06-07
+
   * The height of the Iframe is now dynamically calculated. No need to give this attribute anymore if you want to see the whole output.
+  
 ### 2017-04-28
+
   * Added [Babel](https://babeljs.io/) support
   * Bugs (Https call to Fiddle in place of Http, externalAttributes Resources in the action bar in place of include, Xml was not replaced by HTML code)
   * Cache bursting implementation for the weCodeConsole.(js|css) file so that they are not cached for an new version.
