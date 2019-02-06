@@ -361,31 +361,50 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
     {
 
         $postURL = "https://jsfiddle.net/api/post/library/pure/"; //No Framework
+
+        $externalResources = array();
+        if (array_key_exists(self::EXTERNAL_RESOURCES_ATTRIBUTE_KEY, $attributes)) {
+            $externalResources = explode(",", $attributes[self::EXTERNAL_RESOURCES_ATTRIBUTE_KEY]);
+        }
+
         if (array_key_exists('javascript', $this->codes)) {
-            $postURL = "https://jsfiddle.net/api/post/jQuery/";
+
             if ($this->useConsole) {
                 // If their is a console.log function, add the Firebug Lite support of JsFiddle
                 // Seems to work only with the Edge version of jQuery
-                $postURL .= "edge/dependencies/Lite/";
-            } else {
-                $postURL .= '2.1.3/'; // The end backslash is required in the JSFiddle URL scheme.
+                // $postURL .= "edge/dependencies/Lite/";
+                // The firebug logging is not working anymore because of 404
+                // Adding them here
+                $externalResources[]= 'The firebug resources for the console.log features';
+                $externalResources[]= DOKU_URL . 'lib/plugins/webcode/vendor/firebug-lite.css';
+                $externalResources[]= DOKU_URL . 'lib/plugins/webcode/vendor/firebug-lite-1.2.js';
             }
         }
 
-        $externalResourcesInput = '';
-        if (array_key_exists(self::EXTERNAL_RESOURCES_ATTRIBUTE_KEY, $attributes)) {
-            // The below code is to prevent this JsFiddle bug: https://github.com/jsfiddle/jsfiddle-issues/issues/726
-            // The order of the resources is not guaranteed
-            // We pass then the resources only if their is one resources
-            // Otherwise we pass them as a script element in the HTML.
-            $externalResources = explode(",",$attributes[self::EXTERNAL_RESOURCES_ATTRIBUTE_KEY]);
-            if (count($externalResources)<=1) {
-                $externalResourcesInput = '<input type="hidden" name="resources" value="' . implode(",", $externalResources) . '">';
-            } else {
-                $codes['html'] .=  "\n\n<!-- The resources have been added here because their order is not guarantee through the API. -->\n";
-                $codes['html'] .=  "<!-- See: https://github.com/jsfiddle/jsfiddle-issues/issues/726 -->\n";
-                foreach ($externalResources as $externalResource) {
-                    $codes['html'] .=  "<script src=\"".$externalResource."\"></script>\n";
+
+        // The below code is to prevent this JsFiddle bug: https://github.com/jsfiddle/jsfiddle-issues/issues/726
+        // The order of the resources is not guaranteed
+        // We pass then the resources only if their is one resources
+        // Otherwise we pass them as a script element in the HTML.
+        if (count($externalResources)<=1) {
+            $externalResourcesInput = '<input type="hidden" name="resources" value="' . implode(",", $externalResources) . '">';
+        } else {
+            $codes['html'] .=  "\n\n\n\n\n<!-- The resources -->\n";
+            $codes['html'] .=  "<!-- They have been added here because their order is not guarantee through the API. -->\n";
+            $codes['html'] .=  "<!-- See: https://github.com/jsfiddle/jsfiddle-issues/issues/726 -->\n";
+            foreach ($externalResources as $externalResource) {
+                if ($externalResource != "") {
+                    $extension = pathinfo($externalResource)['extension'];
+                    switch ($extension) {
+                        case "css":
+                            $codes['html'] .= "<link href=\"" . $externalResource . "\" rel=\"stylesheet\">\n";
+                            break;
+                        case "js":
+                            $codes['html'] .= "<script src=\"" . $externalResource . "\"></script>\n";
+                            break;
+                        default:
+                            $codes['html'] .= "<!-- " . $externalResource . " -->\n";
+                    }
                 }
             }
         }
@@ -413,7 +432,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
             '<input type="hidden" name="title" value="'. htmlentities($title).'">' .
             '<input type="hidden" name="description" value="'. htmlentities($description).'">' .
             '<input type="hidden" name="css" value="' . htmlentities($codes['css']) . '">' .
-            '<input type="hidden" name="html" value="' . htmlentities($codes['html']) . '">' .
+            '<input type="hidden" name="html" value="' . htmlentities("<!-- The HTML -->".$codes['html']) . '">' .
             '<input type="hidden" name="js" value="' . htmlentities($jsCode) . '">' .
             '<input type="hidden" name="panel_js" value="' . htmlentities($jsPanel) . '">' .
             '<input type="hidden" name="wrap" value="b">' .  //javascript no wrap in body
