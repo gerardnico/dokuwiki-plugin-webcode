@@ -57,7 +57,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
         return 158;
     }
 
-    // This where the addEntryPattern must bed defined
+    // This where the addEntryPattern must be defined
     public function connectTo($mode)
     {
         $this->Lexer->addEntryPattern('<webcode.*?>(?=.*?</webcode>)', $mode, 'plugin_webcode_' . $this->getPluginComponent());
@@ -78,6 +78,8 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
      * This is an instruction block and is cached apart from the rendering output
      * There is two caches levels
      * This cache may be suppressed with the url parameters ?purge=true
+     *
+     * The returned values are cached in an array that will be passed to the render method
      */
     public function handle($match, $state, $pos, Doku_Handler $handler)
     {
@@ -96,17 +98,33 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                 $attributes['frameborder'] = 1;
                 $attributes['width'] = '100%';
 
+                $renderingModeKey = 'renderingmode';
+                $attributes[$renderingModeKey] = 'story';
+
+                // config Parameters will get their value in lowercase
+                $configAttributes = [$renderingModeKey];
+
                 // /i not case sensitive
                 $attributePattern = "\s*(\w+)\s*=\s*\"?([^\"\s]+)\"?\\s*";
                 $result = preg_match_all('/' . $attributePattern . '/i', $match, $matches);
 
+
                 if ($result != 0) {
                     foreach ($matches[1] as $key => $nodeCodeContent) {
-                        $attributes[strtolower($nodeCodeContent)] = $matches[2][$key];
+                        $attributeKey = strtolower($nodeCodeContent);
+                        $attributeValue = $matches[2][$key];
+                        if (in_array($attributeKey,$configAttributes)){
+                            $attributeValue = strtolower($attributeValue);
+                        }
+                        $attributes[$attributeKey] = $attributeValue;
                     }
                 }
 
-                // Cache the values
+                // We set the attributes on a class scope
+                // to be used in the DOKU_LEXER_UNMATCHED step
+                $this->attributes = $attributes;
+
+                // Cache the values to be used by the render method
                 return array($state, $attributes);
 
             case DOKU_LEXER_UNMATCHED :
@@ -169,9 +187,12 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
                 // Render the whole
                 // Replace babel by javascript because babel highlight does not exist in the dokuwiki and babel is only javascript ES2015
-                $matchedTextToRender = str_replace('babel', 'javascript', $match);
-                $instructions = p_get_instructions($matchedTextToRender);
-                $xhtmlWebCode = p_render('xhtml', $instructions, $info);
+                $xhtmlWebCode = "";
+                if ($this->attributes["renderingmode"] != "onlyresult" ) {
+                    $matchedTextToRender = str_replace('babel', 'javascript', $match);
+                    $instructions = p_get_instructions($matchedTextToRender);
+                    $xhtmlWebCode = p_render('xhtml', $instructions, $info);
+                }
 
                 // Cache the values
                 return array($state, $xhtmlWebCode, $codes, $useConsole);
@@ -313,8 +334,12 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     }
                     $iFrameHtml .= ' srcdoc="' . htmlentities($htmlContent) . '" ></iframe>';//
 
+                    //
+                    $poweredBy = '<div class="webcodeButton"><a href="https://gerardnico.com/wiki/dokuwiki/webcode" class="btn btn-link">'.$this->getLang('RenderedBy').'</a></div>';
+                    $createdBy = '<div class="webcodeButton"><a href="https://gerardnico.com/wiki/about" class="btn btn-link">'.$this->getLang('MadeWithLoveBy').'</a></div>';
+
                     // Add the JsFiddle button
-                    $renderer->doc .= '<div>' . $this->addJsFiddleButton($this->codes, $this->attributes) . $iFrameHtml . '</div>';
+                    $renderer->doc .= '<div class="webCode">'. $iFrameHtml . $poweredBy . $createdBy . $this->addJsFiddleButton($this->codes, $this->attributes) .'</div>';
 
 
                     break;

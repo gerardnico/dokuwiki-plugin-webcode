@@ -31,7 +31,7 @@ class action_plugin_webcode extends DokuWiki_Action_Plugin {
             'type'   => 'format',
             'title'  => $this->getLang('WebCodeButtonTitle').' ('.$this->getLang('AccessKey').': '.$webCodeShortcutKey.')',
             'icon'   => '../../plugins/webcode/images/webcode.png',
-            'open'   => '<webcode name="Default" frameborder=0 width=100% scrolling=yes '.syntax_plugin_webcode_basis::EXTERNAL_RESOURCES_ATTRIBUTE_DISPLAY.'=",">\n',
+            'open'   => '<webcode name="Default" frameborder=0 width=100% scrolling=yes '.syntax_plugin_webcode_basis::EXTERNAL_RESOURCES_ATTRIBUTE_DISPLAY.'="," renderingMode=story >\n',
             'close'  => '\n</webcode>\n',
             'key'    => $webCodeShortcutKey
         );
