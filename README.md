@@ -112,6 +112,7 @@ Technically, the plugin:
 ### Current
 
   * Firebug console was not added when the language was Babel
+  * The output on the console log is now escaped for HTML entities and can then render HTML
   
 ### 2019-02-06
 
