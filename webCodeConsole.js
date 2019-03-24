@@ -52,8 +52,10 @@ window.console.log = function (input) {
     } else {
         s = String(input);
     }
+    s = WEBCODE.htmlEntities(s);
+    // the BR replacement must be after the htmlEntities function ...
     s = s.replace(/\n/g, '<BR>')
-    WEBCODE.appendLine(WEBCODE.htmlEntities(s));
+    WEBCODE.appendLine(s);
 };
 
 // Console table implementation
