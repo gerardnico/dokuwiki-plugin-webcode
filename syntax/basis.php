@@ -113,7 +113,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     foreach ($matches[1] as $key => $nodeCodeContent) {
                         $attributeKey = strtolower($nodeCodeContent);
                         $attributeValue = $matches[2][$key];
-                        if (in_array($attributeKey,$configAttributes)){
+                        if (in_array($attributeKey, $configAttributes)) {
                             $attributeValue = strtolower($attributeValue);
                         }
                         $attributes[$attributeKey] = $attributeValue;
@@ -174,7 +174,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
                         // Check if a javascript console function is used, only if the flag is not set to true
                         if (!$useConsole == true) {
-                            if (in_array($lowerCodeName, array('babel','javascript', 'html', 'xml'))) {
+                            if (in_array($lowerCodeName, array('babel', 'javascript', 'html', 'xml'))) {
                                 // if the code contains 'console.'
                                 $result = preg_match('/' . 'console\.' . '/is', $code);
                                 if ($result) {
@@ -188,7 +188,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                 // Render the whole
                 // Replace babel by javascript because babel highlight does not exist in the dokuwiki and babel is only javascript ES2015
                 $xhtmlWebCode = "";
-                if ($this->attributes["renderingmode"] != "onlyresult" ) {
+                if ($this->attributes["renderingmode"] != "onlyresult") {
                     $matchedTextToRender = str_replace('babel', 'javascript', $match);
                     $instructions = p_get_instructions($matchedTextToRender);
                     $xhtmlWebCode = p_render('xhtml', $instructions, $info);
@@ -257,7 +257,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     if (array_key_exists('babel', $this->codes)) {
                         $babelMin = "https://unpkg.com/babel-standalone@6/babel.min.js";
                         // a load of babel invoke it (be sure to not have it twice
-                        if (!(array_key_exists($babelMin,$externalResources))) {
+                        if (!(array_key_exists($babelMin, $externalResources))) {
                             $externalResources[] = $babelMin;
                         }
                     }
@@ -279,7 +279,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
                     // WebConsole style sheet
                     if ($this->useConsole) {
-                        $htmlContent .= '<link rel="stylesheet" type="text/css" href="' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.css?ver='.self::WEB_CONSOLE_CSS_VERSION.'"></link>';
+                        $htmlContent .= '<link rel="stylesheet" type="text/css" href="' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.css?ver=' . self::WEB_CONSOLE_CSS_VERSION . '"></link>';
                     }
 
                     if (array_key_exists('css', $this->codes)) {
@@ -296,7 +296,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                         $htmlContent .= '<!-- WebCode Console -->';
                         $htmlContent .= '<div><p class=\'webConsoleTitle\'>Console Output:</p>';
                         $htmlContent .= '<div id=\'webCodeConsole\'></div>';
-                        $htmlContent .= '<script type=\'text/javascript\' src=\'' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.js?ver='.self::WEB_CONSOLE_JS_VERSION.'\'></script>';
+                        $htmlContent .= '<script type=\'text/javascript\' src=\'' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.js?ver=' . self::WEB_CONSOLE_JS_VERSION . '\'></script>';
                         $htmlContent .= '</div>';
                     }
                     // The javascript comes at the end because it may want to be applied on previous HTML element
@@ -335,11 +335,11 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     $iFrameHtml .= ' srcdoc="' . htmlentities($htmlContent) . '" ></iframe>';//
 
                     //
-                    $poweredBy = '<div class="webcodeButton"><a href="https://gerardnico.com/wiki/dokuwiki/webcode" class="btn btn-link">'.$this->getLang('RenderedBy').'</a></div>';
-                    $createdBy = '<div class="webcodeButton"><a href="https://gerardnico.com/wiki/about" class="btn btn-link">'.$this->getLang('MadeWithLoveBy').'</a></div>';
+                    $poweredBy = '<div class="webcodeButton"><a href="https://gerardnico.com/wiki/dokuwiki/webcode" class="btn btn-link">' . $this->getLang('RenderedBy') . '</a></div>';
+                    $createdBy = '<div class="webcodeButton"><a href="https://gerardnico.com/wiki/about" class="btn btn-link">' . $this->getLang('MadeWithLoveBy') . '</a></div>';
 
                     // Add the JsFiddle button
-                    $renderer->doc .= '<div class="webCode">'. $iFrameHtml . $poweredBy . $createdBy . $this->addJsFiddleButton($this->codes, $this->attributes) .'</div>';
+                    $renderer->doc .= '<div class="webCode">' . $iFrameHtml . $poweredBy . $createdBy . $this->addJsFiddleButton($this->codes, $this->attributes) . '</div>';
 
 
                     break;
@@ -367,31 +367,28 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
             $externalResources = explode(",", $attributes[self::EXTERNAL_RESOURCES_ATTRIBUTE_KEY]);
         }
 
-        if (array_key_exists('javascript', $this->codes)) {
 
-            if ($this->useConsole) {
-                // If their is a console.log function, add the Firebug Lite support of JsFiddle
-                // Seems to work only with the Edge version of jQuery
-                // $postURL .= "edge/dependencies/Lite/";
-                // The firebug logging is not working anymore because of 404
-                // Adding them here
-                $externalResources[]= 'The firebug resources for the console.log features';
-                $externalResources[]= DOKU_URL . 'lib/plugins/webcode/vendor/firebug-lite.css';
-                $externalResources[]= DOKU_URL . 'lib/plugins/webcode/vendor/firebug-lite-1.2.js';
-            }
+        if ($this->useConsole) {
+            // If their is a console.log function, add the Firebug Lite support of JsFiddle
+            // Seems to work only with the Edge version of jQuery
+            // $postURL .= "edge/dependencies/Lite/";
+            // The firebug logging is not working anymore because of 404
+            // Adding them here
+            $externalResources[] = 'The firebug resources for the console.log features';
+            $externalResources[] = DOKU_URL . 'lib/plugins/webcode/vendor/firebug-lite.css';
+            $externalResources[] = DOKU_URL . 'lib/plugins/webcode/vendor/firebug-lite-1.2.js';
         }
-
 
         // The below code is to prevent this JsFiddle bug: https://github.com/jsfiddle/jsfiddle-issues/issues/726
         // The order of the resources is not guaranteed
         // We pass then the resources only if their is one resources
         // Otherwise we pass them as a script element in the HTML.
-        if (count($externalResources)<=1) {
+        if (count($externalResources) <= 1) {
             $externalResourcesInput = '<input type="hidden" name="resources" value="' . implode(",", $externalResources) . '">';
         } else {
-            $codes['html'] .=  "\n\n\n\n\n<!-- The resources -->\n";
-            $codes['html'] .=  "<!-- They have been added here because their order is not guarantee through the API. -->\n";
-            $codes['html'] .=  "<!-- See: https://github.com/jsfiddle/jsfiddle-issues/issues/726 -->\n";
+            $codes['html'] .= "\n\n\n\n\n<!-- The resources -->\n";
+            $codes['html'] .= "<!-- They have been added here because their order is not guarantee through the API. -->\n";
+            $codes['html'] .= "<!-- See: https://github.com/jsfiddle/jsfiddle-issues/issues/726 -->\n";
             foreach ($externalResources as $externalResource) {
                 if ($externalResource != "") {
                     $extension = pathinfo($externalResource)['extension'];
@@ -411,28 +408,28 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
         $jsCode = $codes['javascript'];
         $jsPanel = 0; // language for the js specific panel (0 = JavaScript)
-        if (array_key_exists('babel',$codes)) {
+        if (array_key_exists('babel', $this->codes)) {
             $jsCode = $codes['babel'];
             $jsPanel = 3; // 3 = Babel
         }
 
         // Title and description
         global $ID;
-        $title=$attributes['name'];
+        $title = $attributes['name'];
         $pageTitle = tpl_pagetitle($ID, true);
         if (!$title) {
 
-            $title="Code from ". $pageTitle;
+            $title = "Code from " . $pageTitle;
         }
-        $description="Code from the page '". $pageTitle ."' \n".wl($ID,$absolute=true);
+        $description = "Code from the page '" . $pageTitle . "' \n" . wl($ID, $absolute = true);
 
         $jsFiddleButtonHtmlCode =
             '<div class="webcodeButton">' .
             '<form method="post" action="' . $postURL . '" target="_blank">' .
-            '<input type="hidden" name="title" value="'. htmlentities($title).'">' .
-            '<input type="hidden" name="description" value="'. htmlentities($description).'">' .
+            '<input type="hidden" name="title" value="' . htmlentities($title) . '">' .
+            '<input type="hidden" name="description" value="' . htmlentities($description) . '">' .
             '<input type="hidden" name="css" value="' . htmlentities($codes['css']) . '">' .
-            '<input type="hidden" name="html" value="' . htmlentities("<!-- The HTML -->".$codes['html']) . '">' .
+            '<input type="hidden" name="html" value="' . htmlentities("<!-- The HTML -->" . $codes['html']) . '">' .
             '<input type="hidden" name="js" value="' . htmlentities($jsCode) . '">' .
             '<input type="hidden" name="panel_js" value="' . htmlentities($jsPanel) . '">' .
             '<input type="hidden" name="wrap" value="b">' .  //javascript no wrap in body

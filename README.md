@@ -108,6 +108,11 @@ Technically, the plugin:
   
 ## Changes
 
+
+### Current
+
+  * Firebug console was not added when the language was Babel
+  
 ### 2019-02-06
 
   * To be able to see the output of a `console.log` javascript statement in JsFiddle, the firebug resources have been added (The JsFiddle feature was broken)
