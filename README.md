@@ -105,6 +105,8 @@ Technically, the plugin:
   * More language with:
      * [sphere-engine](https://developer.sphere-engine.com/api/compilers) - Online example: https://ideone.com
      * or [codingground](https://www.tutorialspoint.com/codingground.htm)
+  * [Mermaid Graph Library](https://mermaidjs.github.io) as language
+  * Add the console after initial rendering to not select console element via css
   
 ## Changes
 
