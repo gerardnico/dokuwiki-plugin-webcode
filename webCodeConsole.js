@@ -34,7 +34,12 @@ let WEBCODE = {
     },
     htmlEntities: function(str) {
         // from https://css-tricks.com/snippets/javascript/htmlentities-for-javascript/
-        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/ /g, '&nbsp;');
     }
 };
 
@@ -45,8 +50,7 @@ window.console.log = function (input) {
         s = "{\n";
         let keys = Object.keys(input);
         for (let i = 0; i < keys.length; i++) {
-            // &nbsp; = one space in HTML
-            s += "&nbsp;&nbsp;" + keys[i] + " : " + input[keys[i]] + ";\n";
+            s += "  " + keys[i] + " : " + input[keys[i]] + ";\n";
         }
         s += "}\n";
     } else {
@@ -76,7 +80,6 @@ window.console.table = function (input) {
             let theadElement = document.createElement("thead");
             let tbodyElement = document.createElement("tbody");
             let trElement = document.createElement("tr");
-            let tdElement = document.createElement("td");
 
             tableElement.appendChild(theadElement);
             tableElement.appendChild(tbodyElement);
@@ -91,8 +94,8 @@ window.console.table = function (input) {
                 if (i === 0) {
 
                     if (typeof element === 'object') {
-                        for (prop in element) {
-                            var thElement = document.createElement("th");
+                        for (let prop in element) {
+                            let thElement = document.createElement("th");
                             thElement.innerHTML = WEBCODE.print(prop);
                             trElement.appendChild(thElement);
                         }
@@ -109,13 +112,13 @@ window.console.table = function (input) {
                 tbodyElement.appendChild(trElement);
 
                 if (typeof input[0] === 'object') {
-                    for (prop in element) {
-                        var tdElement = tdElement.cloneNode(false);
+                    for (let prop in element) {
+                        let tdElement = document.createElement("td");
                         tdElement.innerHTML = WEBCODE.print(element[prop]);
                         trElement.appendChild(tdElement);
                     }
                 } else {
-                    let tdElement = tdElement.cloneNode(false);
+                    let tdElement = document.createElement("td");
                     tdElement.innerHTML = WEBCODE.print(element);
                     trElement.appendChild(tdElement);
                 }
