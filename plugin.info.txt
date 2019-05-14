@@ -1,7 +1,7 @@
 base     webcode
 author   Nicolas GERARD
 email    gerardnico@gmail.com
-date     2019-02-06
+date     2019-05-14
 name     Webcode Plugin
 desc     Plugin that shows and adds the result of (web|browser) code (ie HTML, CSS or Javascript)
 url      https://www.dokuwiki.org/plugin:webcode
