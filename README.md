@@ -7,6 +7,7 @@ The [Webcode Dokuwiki plugin](https://www.dokuwiki.org/plugin:webcode)  renders 
   * CSS
   * HTML
   * [Javascript](#javascript) or [Babel](#babel)
+  * Dokuwiki 
 
 code block.
 
@@ -54,6 +55,10 @@ Install the plugin using:
     <!-- javascript or babel code block -->
     <code javascript> <!-- or <code babel> -->
     </code>
+    
+    <!-- Dokuwiki Code -->
+    <code dw> 
+    </code>
 
 </webcode>
 ```
@@ -77,6 +82,7 @@ The actual [code blocks](https://www.dokuwiki.org/wiki:syntax#code_blocks) suppo
   * code html (or code xml if html is not present). Xml will be seen as XHTML.
   * code css
   * code javascript or babel (but not both)
+  * code dw (for dokuwiki)
 
 
 ## Language Support
@@ -102,6 +108,7 @@ Technically, the plugin:
   * and a button that permits to play with the code on [JsFiddle](https://jsfiddle.net)
 
 ## Road map
+
   * More language with:
      * [sphere-engine](https://developer.sphere-engine.com/api/compilers) - Online example: https://ideone.com
      * or [codingground](https://www.tutorialspoint.com/codingground.htm)
@@ -110,7 +117,9 @@ Technically, the plugin:
   
 ## Changes
 
+### Current
 
+  * Added the possibility to show dokuwiki code if the language extension is dw
 ### 2019-05-14
 
   * Firebug console was not added when the language was Babel

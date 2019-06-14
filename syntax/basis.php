@@ -240,107 +240,112 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
                 case DOKU_LEXER_EXIT :
 
+                    // Dokuwiki Code ?
+                    if (array_key_exists('dw', $this->codes)){
+                        $instructions = p_get_instructions($this->codes['dw']);
+                        $renderer->doc .= p_render('xhtml', $instructions, $info);
+                    } else {
+                        // Js, Html, Css
+                        $htmlContent = '<html><head>';
+                        $htmlContent .= '<meta http-equiv="content-type" content="text/html; charset=UTF-8">';
+                        $htmlContent .= '<title>Made by Webcode</title>';
+                        $htmlContent .= '<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css">';
 
-                    $htmlContent = '<html><head>';
-                    $htmlContent .= '<meta http-equiv="content-type" content="text/html; charset=UTF-8">';
-                    $htmlContent .= '<title>Made by Webcode</title>';
-                    $htmlContent .= '<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css">';
 
-
-                    // External Resources such as css stylesheet or js
-                    $externalResources = array();
-                    if (array_key_exists(self::EXTERNAL_RESOURCES_ATTRIBUTE_KEY, $this->attributes)) {
-                        $externalResources = explode(",", $this->attributes[self::EXTERNAL_RESOURCES_ATTRIBUTE_KEY]);
-                    }
-
-                    // Babel Preprocessor, if babel is used, add it to the external resources
-                    if (array_key_exists('babel', $this->codes)) {
-                        $babelMin = "https://unpkg.com/babel-standalone@6/babel.min.js";
-                        // a load of babel invoke it (be sure to not have it twice
-                        if (!(array_key_exists($babelMin, $externalResources))) {
-                            $externalResources[] = $babelMin;
+                        // External Resources such as css stylesheet or js
+                        $externalResources = array();
+                        if (array_key_exists(self::EXTERNAL_RESOURCES_ATTRIBUTE_KEY, $this->attributes)) {
+                            $externalResources = explode(",", $this->attributes[self::EXTERNAL_RESOURCES_ATTRIBUTE_KEY]);
                         }
-                    }
 
-                    // Add the external resources
-                    foreach ($externalResources as $externalResource) {
-                        $pathInfo = pathinfo($externalResource);
-                        $fileExtension = $pathInfo['extension'];
-                        switch ($fileExtension) {
-                            case 'css':
-                                $htmlContent .= '<link rel="stylesheet" type="text/css" href="' . $externalResource . '">';
-                                break;
-                            case 'js':
-                                $htmlContent .= '<script type="text/javascript" src="' . $externalResource . '"></script>';
-                                break;
+                        // Babel Preprocessor, if babel is used, add it to the external resources
+                        if (array_key_exists('babel', $this->codes)) {
+                            $babelMin = "https://unpkg.com/babel-standalone@6/babel.min.js";
+                            // a load of babel invoke it (be sure to not have it twice
+                            if (!(array_key_exists($babelMin, $externalResources))) {
+                                $externalResources[] = $babelMin;
+                            }
                         }
-                    }
 
-
-                    // WebConsole style sheet
-                    if ($this->useConsole) {
-                        $htmlContent .= '<link rel="stylesheet" type="text/css" href="' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.css?ver=' . self::WEB_CONSOLE_CSS_VERSION . '"></link>';
-                    }
-
-                    if (array_key_exists('css', $this->codes)) {
-                        $htmlContent .= '<!-- The CSS code -->';
-                        $htmlContent .= '<style>' . $this->codes['css'] . '</style>';
-                    };
-                    $htmlContent .= '</head><body style="margin:10px">';
-                    if (array_key_exists('html', $this->codes)) {
-                        $htmlContent .= '<!-- The HTML code -->';
-                        $htmlContent .= $this->codes['html'];
-                    }
-                    // The javascript console area is based at the end of the HTML document
-                    if ($this->useConsole) {
-                        $htmlContent .= '<!-- WebCode Console -->';
-                        $htmlContent .= '<div><p class=\'webConsoleTitle\'>Console Output:</p>';
-                        $htmlContent .= '<div id=\'webCodeConsole\'></div>';
-                        $htmlContent .= '<script type=\'text/javascript\' src=\'' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.js?ver=' . self::WEB_CONSOLE_JS_VERSION . '\'></script>';
-                        $htmlContent .= '</div>';
-                    }
-                    // The javascript comes at the end because it may want to be applied on previous HTML element
-                    // as the page load in the IO order, javascript must be placed at the end
-                    if (array_key_exists('javascript', $this->codes)) {
-                        $htmlContent .= '<!-- The Javascript code -->';
-                        $htmlContent .= '<script type="text/javascript">' . $this->codes['javascript'] . '</script>';
-                    }
-                    if (array_key_exists('babel', $this->codes)) {
-                        $htmlContent .= '<!-- The Babel code -->';
-                        $htmlContent .= '<script type="text/babel">' . $this->codes['babel'] . '</script>';
-                    }
-                    $htmlContent .= '</body></html>';
-
-                    // Here the magic from the plugin happens
-                    // We add the Iframe and the JsFiddleButton
-                    $iFrameHtml = '<iframe ';
-
-                    // We add the name HTML attribute
-                    $name = "WebCode iFrame";
-                    if (array_key_exists('name', $this->attributes)) {
-                        $name .= ' ' . $this->attributes['name'];
-                    }
-                    $iFrameHtml .= ' name="' . $name . '" ';
-
-                    // The class to be able to select them
-                    $iFrameHtml .= ' class="webCode" ';
-
-                    // We add the others HTML attributes
-                    $iFrameHtmlAttributes = array('width', 'height', 'frameborder', 'scrolling');
-                    foreach ($this->attributes as $attribute => $value) {
-                        if (in_array($attribute, $iFrameHtmlAttributes)) {
-                            $iFrameHtml .= ' ' . $attribute . '=' . $value;
+                        // Add the external resources
+                        foreach ($externalResources as $externalResource) {
+                            $pathInfo = pathinfo($externalResource);
+                            $fileExtension = $pathInfo['extension'];
+                            switch ($fileExtension) {
+                                case 'css':
+                                    $htmlContent .= '<link rel="stylesheet" type="text/css" href="' . $externalResource . '">';
+                                    break;
+                                case 'js':
+                                    $htmlContent .= '<script type="text/javascript" src="' . $externalResource . '"></script>';
+                                    break;
+                            }
                         }
+
+
+                        // WebConsole style sheet
+                        if ($this->useConsole) {
+                            $htmlContent .= '<link rel="stylesheet" type="text/css" href="' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.css?ver=' . self::WEB_CONSOLE_CSS_VERSION . '"></link>';
+                        }
+
+                        if (array_key_exists('css', $this->codes)) {
+                            $htmlContent .= '<!-- The CSS code -->';
+                            $htmlContent .= '<style>' . $this->codes['css'] . '</style>';
+                        };
+                        $htmlContent .= '</head><body style="margin:10px">';
+                        if (array_key_exists('html', $this->codes)) {
+                            $htmlContent .= '<!-- The HTML code -->';
+                            $htmlContent .= $this->codes['html'];
+                        }
+                        // The javascript console area is based at the end of the HTML document
+                        if ($this->useConsole) {
+                            $htmlContent .= '<!-- WebCode Console -->';
+                            $htmlContent .= '<div><p class=\'webConsoleTitle\'>Console Output:</p>';
+                            $htmlContent .= '<div id=\'webCodeConsole\'></div>';
+                            $htmlContent .= '<script type=\'text/javascript\' src=\'' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.js?ver=' . self::WEB_CONSOLE_JS_VERSION . '\'></script>';
+                            $htmlContent .= '</div>';
+                        }
+                        // The javascript comes at the end because it may want to be applied on previous HTML element
+                        // as the page load in the IO order, javascript must be placed at the end
+                        if (array_key_exists('javascript', $this->codes)) {
+                            $htmlContent .= '<!-- The Javascript code -->';
+                            $htmlContent .= '<script type="text/javascript">' . $this->codes['javascript'] . '</script>';
+                        }
+                        if (array_key_exists('babel', $this->codes)) {
+                            $htmlContent .= '<!-- The Babel code -->';
+                            $htmlContent .= '<script type="text/babel">' . $this->codes['babel'] . '</script>';
+                        }
+                        $htmlContent .= '</body></html>';
+
+                        // Here the magic from the plugin happens
+                        // We add the Iframe and the JsFiddleButton
+                        $iFrameHtml = '<iframe ';
+
+                        // We add the name HTML attribute
+                        $name = "WebCode iFrame";
+                        if (array_key_exists('name', $this->attributes)) {
+                            $name .= ' ' . $this->attributes['name'];
+                        }
+                        $iFrameHtml .= ' name="' . $name . '" ';
+
+                        // The class to be able to select them
+                        $iFrameHtml .= ' class="webCode" ';
+
+                        // We add the others HTML attributes
+                        $iFrameHtmlAttributes = array('width', 'height', 'frameborder', 'scrolling');
+                        foreach ($this->attributes as $attribute => $value) {
+                            if (in_array($attribute, $iFrameHtmlAttributes)) {
+                                $iFrameHtml .= ' ' . $attribute . '=' . $value;
+                            }
+                        }
+                        $iFrameHtml .= ' srcdoc="' . htmlentities($htmlContent) . '" ></iframe>';//
+
+                        //
+                        $poweredBy = '<div class="webcodeButton"><a href="https://gerardnico.com/wiki/dokuwiki/webcode" class="btn btn-link">' . $this->getLang('RenderedBy') . '</a></div>';
+                        $createdBy = '<div class="webcodeButton"><a href="https://gerardnico.com/wiki/about" class="btn btn-link">' . $this->getLang('MadeWithLoveBy') . '</a></div>';
+
+                        // Add the JsFiddle button
+                        $renderer->doc .= '<div class="webCode">' . $iFrameHtml . $poweredBy . $createdBy . $this->addJsFiddleButton($this->codes, $this->attributes) . '</div>';
                     }
-                    $iFrameHtml .= ' srcdoc="' . htmlentities($htmlContent) . '" ></iframe>';//
-
-                    //
-                    $poweredBy = '<div class="webcodeButton"><a href="https://gerardnico.com/wiki/dokuwiki/webcode" class="btn btn-link">' . $this->getLang('RenderedBy') . '</a></div>';
-                    $createdBy = '<div class="webcodeButton"><a href="https://gerardnico.com/wiki/about" class="btn btn-link">' . $this->getLang('MadeWithLoveBy') . '</a></div>';
-
-                    // Add the JsFiddle button
-                    $renderer->doc .= '<div class="webCode">' . $iFrameHtml . $poweredBy . $createdBy . $this->addJsFiddleButton($this->codes, $this->attributes) . '</div>';
-
 
                     break;
             }
