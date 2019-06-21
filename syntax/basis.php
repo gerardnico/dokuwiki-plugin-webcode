@@ -189,7 +189,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                 // Replace babel by javascript because babel highlight does not exist in the dokuwiki and babel is only javascript ES2015
                 $xhtmlWebCode = "";
                 if ($this->attributes["renderingmode"] != "onlyresult") {
-                    $matchedTextToRender = str_replace('babel', 'javascript', $match);
+                    $matchedTextToRender = preg_replace('/<code[\s]+babel/', '<code javascript', $match);
                     $instructions = p_get_instructions($matchedTextToRender);
                     $xhtmlWebCode = p_render('xhtml', $instructions, $info);
                 }

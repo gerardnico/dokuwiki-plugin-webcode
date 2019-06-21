@@ -120,6 +120,8 @@ Technically, the plugin:
 ### Current
 
   * Added the possibility to show dokuwiki code if the language extension is dw
+  * Bug: the babel term was replaced by Javascript also in the code. It should be only on the code definition.
+
 ### 2019-05-14
 
   * Firebug console was not added when the language was Babel
