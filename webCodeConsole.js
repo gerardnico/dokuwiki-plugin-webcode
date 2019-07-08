@@ -79,11 +79,11 @@ window.console.table = function (input) {
             let tableElement = document.createElement("table");
             let theadElement = document.createElement("thead");
             let tbodyElement = document.createElement("tbody");
-            let trElement = document.createElement("tr");
+            let trHeadElement = document.createElement("tr");
 
             tableElement.appendChild(theadElement);
             tableElement.appendChild(tbodyElement);
-            theadElement.appendChild(trElement);
+            theadElement.appendChild(trHeadElement);
 
 
             for (let i = 0; i < input.length; i++) {
@@ -97,29 +97,30 @@ window.console.table = function (input) {
                         for (let prop in element) {
                             let thElement = document.createElement("th");
                             thElement.innerHTML = WEBCODE.print(prop);
-                            trElement.appendChild(thElement);
+                            trHeadElement.appendChild(thElement);
                         }
                     } else {
                         // Header
                         let thElement = document.createElement("th");
                         thElement.innerHTML = "Values";
-                        trElement.appendChild(thElement);
+                        trHeadElement.appendChild(thElement);
                     }
 
                 }
 
-                let trElement = trElement.cloneNode(false);
-                tbodyElement.appendChild(trElement);
+                let trBodyElement = document.createElement("tr");
+                tbodyElement.appendChild(trBodyElement);
 
                 if (typeof input[0] === 'object') {
                     for (let prop in element) {
                         let tdElement = document.createElement("td");
                         tdElement.innerHTML = WEBCODE.print(element[prop]);
-                        trElement.appendChild(tdElement);
+                        trBodyElement.appendChild(tdElement);
                     }
                 } else {
                     let tdElement = document.createElement("td");
                     tdElement.innerHTML = WEBCODE.print(element);
+                    let trElement = document.createElement("tr");
                     trElement.appendChild(tdElement);
                 }
 

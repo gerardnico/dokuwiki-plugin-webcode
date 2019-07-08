@@ -121,6 +121,7 @@ Technically, the plugin:
 
   * Added the possibility to show dokuwiki code if the language extension is dw
   * Bug: the babel term was replaced by Javascript also in the code. It should be only on the code definition.
+  * Bug: trElement was declared two times in two different scope causing problem
 
 ### 2019-05-14
 
