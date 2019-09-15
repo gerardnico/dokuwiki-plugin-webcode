@@ -110,8 +110,8 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
 
                 if ($result != 0) {
-                    foreach ($matches[1] as $key => $nodeCodeContent) {
-                        $attributeKey = strtolower($nodeCodeContent);
+                    foreach ($matches[1] as $key => $lang) {
+                        $attributeKey = strtolower($lang);
                         $attributeValue = $matches[2][$key];
                         if (in_array($attributeKey, $configAttributes)) {
                             $attributeValue = strtolower($attributeValue);
@@ -137,28 +137,20 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
                 // Regexp Pattern to parse the codes block
                 $codePattern = "<code\s*([^>\s]*)\s*([^>\s]*)>(.+?)<\/code>";
+                // The first group is the lang
+                // The second group is the file name and options
+                // The third group is the code
                 $result = preg_match_all('/' . $codePattern . '/msi', $match, $matches, PREG_PATTERN_ORDER);
                 if ($result != 0) {
 
                     // Loop through the block codes
-                    foreach ($matches[1] as $key => $nodeCodeContent) {
+                    foreach ($matches[1] as $key => $lang) {
 
                         // Get the code (The content between the code nodes)
                         $code = $matches[3][$key];
 
-                        // The attributes of the code element
-                        // Example:<code javascript type="text/babel">
-                        $firstSpace = strpos($nodeCodeContent, " ");
-                        // If there is a space, there is may be attributes
-                        if ($firstSpace) {
-                            $codeName = substr($nodeCodeContent, 0, $firstSpace);
-                        } else {
-                            // There is no attributes, this is the code name
-                            $codeName = $nodeCodeContent;
-                        }
-
                         // String are in lowercase
-                        $lowerCodeName = strtolower($codeName);
+                        $lowerCodeName = strtolower($lang);
 
                         // Xml is html
                         if ($lowerCodeName == 'xml') {
@@ -190,7 +182,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                 if ($this->attributes["renderingmode"] != "onlyresult") {
                     // Replace babel by javascript because babel highlight does not exist in the dokuwiki and babel is only javascript ES2015
                     $matchedTextToRender = preg_replace('/<code[\s]+babel/', '<code javascript', $match);
-                    $matchedTextToRender = preg_replace('/<code(.*)display\s*=\s*"none"(.*)<\/code>/msiU','',$matchedTextToRender);
+                    $matchedTextToRender = preg_replace('/<code([a-z\s]*)\[([a-z\s]*)display="none"([a-z\s]*)\]>(.*)<\/code>/msiU','',$matchedTextToRender);
                     $instructions = p_get_instructions($matchedTextToRender);
                     $xhtmlWebCode = p_render('xhtml', $instructions, $info);
                 }

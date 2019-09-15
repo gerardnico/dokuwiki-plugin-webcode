@@ -95,7 +95,7 @@ where:
       * javascript or babel (but not both in a webcode)
       * dw (for dokuwiki)
   *  to not display the code block
-  * `display="none"` will not display the code block
+  * `display="none"` will not display the code block (in this case file name should not be used)
 
 
 
