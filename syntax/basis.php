@@ -136,15 +136,15 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                 $useConsole = false;
 
                 // Regexp Pattern to parse the codes block
-                $codePattern = "\<code\s*(\w+)\s*[\w\s\.]*\>(.+?)\<\/code\>";
-                $result = preg_match_all('/' . $codePattern . '/is', $match, $matches, PREG_PATTERN_ORDER);
+                $codePattern = "<code\s*([^>\s]*)\s*([^>\s]*)>(.+?)<\/code>";
+                $result = preg_match_all('/' . $codePattern . '/msi', $match, $matches, PREG_PATTERN_ORDER);
                 if ($result != 0) {
 
                     // Loop through the block codes
                     foreach ($matches[1] as $key => $nodeCodeContent) {
 
                         // Get the code (The content between the code nodes)
-                        $code = $matches[2][$key];
+                        $code = $matches[3][$key];
 
                         // The attributes of the code element
                         // Example:<code javascript type="text/babel">
@@ -186,10 +186,11 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                 }
 
                 // Render the whole
-                // Replace babel by javascript because babel highlight does not exist in the dokuwiki and babel is only javascript ES2015
                 $xhtmlWebCode = "";
                 if ($this->attributes["renderingmode"] != "onlyresult") {
+                    // Replace babel by javascript because babel highlight does not exist in the dokuwiki and babel is only javascript ES2015
                     $matchedTextToRender = preg_replace('/<code[\s]+babel/', '<code javascript', $match);
+                    $matchedTextToRender = preg_replace('/<code(.*)display\s*=\s*"none"(.*)<\/code>/msiU','',$matchedTextToRender);
                     $instructions = p_get_instructions($matchedTextToRender);
                     $xhtmlWebCode = p_render('xhtml', $instructions, $info);
                 }

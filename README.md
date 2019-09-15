@@ -58,6 +58,9 @@ Install the plugin using:
     
     <!-- Dokuwiki Code -->
     <code dw> 
+    
+    <!-- Code Block not displayed-->
+    <code language [display="none"]>
     </code>
 
 </webcode>
@@ -79,10 +82,21 @@ The allowed webcode attributes are:
 
 The actual [code blocks](https://www.dokuwiki.org/wiki:syntax#code_blocks) supported are:
 
-  * code html (or code xml if html is not present). Xml will be seen as XHTML.
-  * code css
-  * code javascript or babel (but not both)
-  * code dw (for dokuwiki)
+```
+<code lang filePath [display="none"]>
+</code>
+```
+where:
+
+  * lang is:
+      * html 
+      * xml (will be seen as XHTML)
+      * css
+      * javascript or babel (but not both in a webcode)
+      * dw (for dokuwiki)
+  *  to not display the code block
+  * `display="none"` will not display the code block
+
 
 
 ## Language Support
@@ -122,6 +136,7 @@ Technically, the plugin:
   * Added the possibility to show dokuwiki code if the language extension is dw
   * Bug: the babel term was replaced by Javascript also in the code. It should be only on the code definition.
   * Bug: trElement was declared two times in two different scope causing problem
+  * Added the possibility to cache a code block
 
 ### 2019-05-14
 

@@ -1,0 +1,23 @@
+====== Webcode - Not displaying code block  ======
+
+===== About =====
+This is possible to cache code block with this syntax:
+
+<file>
+<code [display="none"]>
+// cached
+</code>
+</file>
+
+===== Example =====
+
+<webcode name="Default" frameborder=0 renderingMode=story >
+  * We should not see the code block below
+<code javascript [display="none"]>
+console.log("This code is not displayed but will be visible in the console.");
+</code>
+  * We should see a code block below
+<code javascript>
+console.log("This code is displayed");
+</code>
+</webcode>
