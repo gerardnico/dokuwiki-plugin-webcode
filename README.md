@@ -123,6 +123,12 @@ Technically, the plugin:
 
 ## Road map
 
+  * Allow Runkit (This [code](https://gerardnico.com/web/javascript/node/script#browser) works on JsFiddle but not in webcode ) may be cause by the restrictions. See below.
+```html
+<iframe name="result" allow="midi *; geolocation *; microphone *; camera *; encrypted-media *;" 
+sandbox="allow-modals allow-forms allow-scripts allow-same-origin allow-popups allow-top-navigation-by-user-activation" allowfullscreen="" allowpaymentrequest="" frameborder="0" src="">
+ </iframe>
+```
   * More language with:
      * [sphere-engine](https://developer.sphere-engine.com/api/compilers) - Online example: https://ideone.com
      * or [codingground](https://www.tutorialspoint.com/codingground.htm
