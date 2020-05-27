@@ -149,13 +149,14 @@ sandbox="allow-modals allow-forms allow-scripts allow-same-origin allow-popups a
   
 ## Changes
 
-### Current
+### 2020-05-27
 
   * Added the possibility to show dokuwiki code if the language extension is dw
   * Bug: the babel term was replaced by Javascript also in the code. It should be only on the code definition.
   * Bug: trElement was declared two times in two different scope causing problem
   * Added the possibility to cache a code block
   * Webcode has been restructured (with the use of addPattern) and can now wrap headers (level, section). It can then be used for a howto page.
+  * Automatic test and travis has been added
 
 ### 2019-05-14
 
