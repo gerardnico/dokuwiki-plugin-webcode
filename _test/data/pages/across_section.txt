@@ -1,0 +1,43 @@
+====== Webcode ======
+
+===== Description =====
+A webcode may be used across several header in order to create a How to for instance.
+In this case:
+  * the TOC should not break
+  * the edit should go to the good location
+
+
+===== Example: How to Steps =====
+<webcode name="element.style.fontSize" frameborder=0 scrolling=yes >
+==== Define a css stylesheet ====
+We define a stylesheet to show that the value of ''element.style.fontSize'' is not defined in this case.
+<code css index.css>
+.sheet { font-size: 15px }
+</code>
+==== Create the HTML page ====
+  * with an inline style
+<code html index.html>
+<p style="font-size: 20px">A p element with the font-size defined inline</p>
+</code>
+  * with a class defined in the sylesheet
+<code html index.html>
+<p class="sheet">A p element with the font-size defined by a stylesheet</p>
+</code>
+==== Retrieve the elements with Javascript ====
+  * Get all P element
+<code javascript index.js>
+allP = document.querySelectorAll("p");
+</code>
+==== Output the value of element.style.fontSize for each element ====
+  * The first ''p'' element will have a element.style.fontSize
+<code javascript index.js>
+console.log("The first p with an inline definition has a fontSize property of "+allP.item(1).style.fontSize);
+</code>
+  * The second will have not
+<code javascript index.js>
+console.log("The second p with a stylesheet definition has an undefined fontSize property "+(typeof allP.item(0).style.fontSize == 'undefined'));
+</code>
+==== Result ====
+
+</webcode>
+

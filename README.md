@@ -66,6 +66,8 @@ Install the plugin using:
 </webcode>
 ```
 
+### Webcode attributes 
+
 The allowed webcode attributes are:
 
    * the following attributes of the [iframe element](https://docs.webplatform.org/wiki/html/elements/iframe)
@@ -80,7 +82,9 @@ The allowed webcode attributes are:
       * onlyResult: The rendering will **suppress** the content inside the `webcode` elements and will show only the result after the closing `webcode` code.
 
 
-The actual [code blocks](https://www.dokuwiki.org/wiki:syntax#code_blocks) supported are:
+### code attributes
+
+The supported code block syntax is
 
 ```
 <code lang filePath [display="none"]>
@@ -94,9 +98,9 @@ where:
       * css
       * javascript or babel (but not both in a webcode)
       * dw (for dokuwiki)
-  *  to not display the code block
-  * `display="none"` will not display the code block (in this case file name should not be used)
+  * `display="none"` will not display the code block (in this case file name and other attributes should not be used)
 
+See the actual [code blocks](https://www.dokuwiki.org/wiki:syntax#code_blocks)
 
 
 ## Language Support
@@ -144,6 +148,7 @@ sandbox="allow-modals allow-forms allow-scripts allow-same-origin allow-popups a
   * Bug: the babel term was replaced by Javascript also in the code. It should be only on the code definition.
   * Bug: trElement was declared two times in two different scope causing problem
   * Added the possibility to cache a code block
+  * Webcode has been restructured (with the use of addPattern) and can now wrap headers (level, section). It can then be used for a howto page.
 
 ### 2019-05-14
 
