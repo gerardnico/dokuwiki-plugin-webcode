@@ -39,34 +39,98 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
      */
     private $useConsole = false;
 
-    /*
-     * What is the type of this plugin ?
-     * This a plugin categorization
-     * This is only important for other plugin
-     * See @getAllowedTypes
+
+    /**
+     * Syntax Type.
+     *
+     * Needs to return one of the mode types defined in $PARSER_MODES in parser.php
+     * @see https://www.dokuwiki.org/devel:syntax_plugins#syntax_types
+     *
+     * container because it may contain header in case of how to
      */
     public function getType()
     {
-        return 'protected';
+        // formatting ?
+        // container
+        return 'container';
+    }
+
+    /**
+     * @return array
+     * Allow which kind of plugin inside
+     *
+     * array('container', 'baseonly','formatting', 'substition', 'protected', 'disabled', 'paragraphs')
+     *
+     */
+    public function getAllowedTypes()
+    {
+        return array('container', 'baseonly', 'formatting', 'substition', 'protected', 'disabled', 'paragraphs');
+    }
+
+    /*
+     * Don't accept the code mode
+     * in order to get the code block
+     * in the DOKU_LEXER_MATCHED state through addPattern
+     */
+    function accepts($mode)
+    {
+        if ($mode == "code") {
+            return false;
+        }
+        return parent::accepts($mode);
     }
 
 
-    // Sort order in which the plugin are applied
+    /**
+     * @see Doku_Parser_Mode::getSort()
+     * The mode (plugin) with the lowest sort number will win out
+     *
+     * See {@link Doku_Parser_Mode_code}
+     */
     public function getSort()
     {
-        return 158;
+        return 199;
     }
 
-    // This where the addEntryPattern must be defined
+    /**
+     * Called before any calls to ConnectTo
+     * @return void
+     */
+    function preConnect()
+    {
+    }
+
+    /**
+     * Create a pattern that will called this plugin
+     *
+     * @param string $mode
+     *
+     * All dokuwiki mode can be seen in the parser.php file
+     * @see Doku_Parser_Mode::connectTo()
+     */
     public function connectTo($mode)
     {
-        $this->Lexer->addEntryPattern('<webcode.*?>(?=.*?</webcode>)', $mode, 'plugin_webcode_' . $this->getPluginComponent());
+
+        $this->Lexer->addEntryPattern('<webcode.*?>(?=.*?</webcode>)', $mode, $this->getPluginMode());
+
     }
+
 
     // This where the addPattern and addExitPattern are defined
     public function postConnect()
     {
-        $this->Lexer->addExitPattern('</webcode>', 'plugin_webcode_' . $this->getPluginComponent());
+
+        /**
+         * Capture all code block
+         * See {@link Doku_Parser_Mode_code}
+         */
+        $this->Lexer->addPattern('<code.*?</code>', $this->getPluginMode());
+
+        /**
+         * End
+         */
+        $this->Lexer->addExitPattern('</webcode>', $this->getPluginMode());
+
     }
 
 
@@ -80,6 +144,17 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
      * This cache may be suppressed with the url parameters ?purge=true
      *
      * The returned values are cached in an array that will be passed to the render method
+     * The handle function goal is to parse the matched syntax through the pattern function
+     * and to return the result for use in the renderer
+     * This result is always cached until the page is modified.
+     * @param string $match
+     * @param int $state
+     * @param int $pos
+     * @param Doku_Handler $handler
+     * @return array|bool
+     * @throws Exception
+     * @see DokuWiki_Syntax_Plugin::handle()
+     *
      */
     public function handle($match, $state, $pos, Doku_Handler $handler)
     {
@@ -127,12 +202,21 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                 // Cache the values to be used by the render method
                 return array($state, $attributes);
 
-            case DOKU_LEXER_UNMATCHED :
+
+            /**
+             * The code block as asked
+             * by addPattern() into {@link postConnect}
+             */
+            case DOKU_LEXER_MATCHED:
+
+                $xhtmlWebCode = "";
 
                 // We got the content between the webcode tag and its attributes
                 // We parse it in order to extract the code in the codes array
                 $codes = array();
-                // Does the javascript contains a console statement
+                /**
+                 * Does the javascript contains a console statement
+                */
                 $useConsole = false;
 
                 // Regexp Pattern to parse the codes block
@@ -141,7 +225,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                 // The second group is the file name and options
                 // The third group is the code
                 $result = preg_match_all('/' . $codePattern . '/msi', $match, $matches, PREG_PATTERN_ORDER);
-                if ($result != 0) {
+                if ($result) {
 
                     // Loop through the block codes
                     foreach ($matches[1] as $key => $lang) {
@@ -175,20 +259,25 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                             }
                         }
                     }
+                    // Render the whole
+                    if ($this->attributes["renderingmode"] != "onlyresult") {
+                        // Replace babel by javascript because babel highlight does not exist in the dokuwiki and babel is only javascript ES2015
+                        $matchedTextToRender = preg_replace('/<code[\s]+babel/', '<code javascript', $match);
+                        $matchedTextToRender = preg_replace('/<code([a-z\s]*)\[([a-z\s]*)display="none"([a-z\s]*)\]>(.*)<\/code>/msiU', '', $matchedTextToRender);
+                        $instructions = p_get_instructions($matchedTextToRender);
+                        $xhtmlWebCode = p_render('xhtml', $instructions, $info);
+                    }
+                    return array($state, $xhtmlWebCode, $codes, $useConsole);
+
+                } else {
+                    throw new Exception("There was a match of the pattern but not when parsing");
                 }
 
-                // Render the whole
-                $xhtmlWebCode = "";
-                if ($this->attributes["renderingmode"] != "onlyresult") {
-                    // Replace babel by javascript because babel highlight does not exist in the dokuwiki and babel is only javascript ES2015
-                    $matchedTextToRender = preg_replace('/<code[\s]+babel/', '<code javascript', $match);
-                    $matchedTextToRender = preg_replace('/<code([a-z\s]*)\[([a-z\s]*)display="none"([a-z\s]*)\]>(.*)<\/code>/msiU','',$matchedTextToRender);
-                    $instructions = p_get_instructions($matchedTextToRender);
-                    $xhtmlWebCode = p_render('xhtml', $instructions, $info);
-                }
+
+            case DOKU_LEXER_UNMATCHED :
 
                 // Cache the values
-                return array($state, $xhtmlWebCode, $codes, $useConsole);
+                return array($state, $match);
 
             case DOKU_LEXER_EXIT:
 
@@ -200,8 +289,15 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
     }
 
     /**
-     * Create output
+     * Render the output
+     * @param string $mode
+     * @param Doku_Renderer $renderer
+     * @param array $data - what the function handle() return'ed
+     * @return bool - rendered correctly (not used)
+     *
      * The rendering process
+     * @see DokuWiki_Syntax_Plugin::render()
+     *
      */
     public function render($mode, Doku_Renderer $renderer, $data)
     {
@@ -210,6 +306,8 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
         // $mode = 'xhtml' means that we output html
         // There is other mode such as metadata where you can output data for the headers (Not 100% sure)
         if ($mode == 'xhtml') {
+
+            /** @var Doku_Renderer_xhtml $renderer */
 
             $state = $data[0];
             switch ($state) {
@@ -221,20 +319,34 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     $this->attributes = $data[1];
                     break;
 
-                case DOKU_LEXER_UNMATCHED :
+                case DOKU_LEXER_MATCHED :
 
                     // The extracted data are the codes for this step
                     // We put them in a class variable so that we can use them in the last step (DOKU_LEXER_EXIT)
-                    $this->codes = $data[2];
-                    $this->useConsole = $data[3];
-                    // Add the wiki output between the two webcode tag
+                    $code = $data[2];
+                    $codeType = key($code);
+                    $this->codes[$codeType] = $this->codes[$codeType]. $code[$codeType];
+
+                    // if not true, see if it's true
+                    if (!$this->useConsole) {
+                        $this->useConsole = $data[3];
+                    }
+
+                    // Render
                     $renderer->doc .= $data[1];
                     break;
 
+                case DOKU_LEXER_UNMATCHED :
+
+                    // Render and escape
+                    $renderer->doc .= $renderer->_xmlEntities($data[1]);
+                    break;
+
                 case DOKU_LEXER_EXIT :
+                    // Create the real output of webcode
 
                     // Dokuwiki Code ?
-                    if (array_key_exists('dw', $this->codes)){
+                    if (array_key_exists('dw', $this->codes)) {
                         $instructions = p_get_instructions($this->codes['dw']);
                         $renderer->doc .= p_render('xhtml', $instructions, $info);
                     } else {
@@ -450,5 +562,17 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
         // TODO
         // http://blog.codepen.io/documentation/api/prefill/
     }
+
+
+    /**
+     * @return string the mode (the name of this plugin for the lexer)
+     */
+    public function getPluginMode()
+    {
+        $pluginName = $this->getPluginName();
+        $pluginComponent = $this->getPluginComponent();
+        return 'plugin_' . $pluginName . '_' . $pluginComponent;
+    }
+
 
 }

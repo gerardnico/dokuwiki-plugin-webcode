@@ -18,6 +18,23 @@ class dokuwiki_plugin_webcode_basis_test extends DokuWikiTest
 
     const PLUGIN_NAME = 'webcode';
 
+    public function test_no_code_webcode() {
+
+        $info = array();
+        $instructions = p_get_instructions('<'.self::PLUGIN_NAME.'>'
+            .DW_LF
+            .'==== Header ===='
+            .DW_LF
+            .'</'.self::PLUGIN_NAME.'>');
+        $xhtml = p_render('xhtml', $instructions, $info);
+
+        $expected = '<h1>Header</h1>';
+
+
+        $this->assertEquals($expected, $xhtml);
+
+    }
+
     public function test_base_webcode() {
 
         $info = array();
