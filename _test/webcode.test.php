@@ -59,7 +59,7 @@ class dokuwiki_plugin_webcode_basis_test extends DokuWikiTest
 
 
         $content='Teaser content';
-        $id = 'test:webcode:nowebcode';
+        $id = 'test:webcode:oncodeblock';
         saveWikiText($id,'<'.self::PLUGIN_NAME.'>'
             .DW_LF
             .'==== Header ===='
@@ -82,13 +82,11 @@ class dokuwiki_plugin_webcode_basis_test extends DokuWikiTest
      */
     public function test_two_webcode() {
 
-        $content='Teaser content';
         $id = 'test:webcode:twowebcode';
         $webcode = '<' . self::PLUGIN_NAME . '>'
             . DW_LF
             . '==== Header ===='
             . DW_LF
-            . $content
             . '<code><p>Hello World</p></code>'
             . DW_LF
             . '</' . self::PLUGIN_NAME . '>';
@@ -96,9 +94,35 @@ class dokuwiki_plugin_webcode_basis_test extends DokuWikiTest
 
         $testRequest = new TestRequest();
         $testResponse = $testRequest->get(array('id' => $id));
-        print($testResponse->getContent());
         $iframe = $testResponse->queryHTML('iframe' );
         $this->assertEquals(2, $iframe->length);
+        // code is render with a pre
+        $pre = $testResponse->queryHTML('pre' );
+        $this->assertEquals(2, $iframe->length);
+
+    }
+
+    /**
+     * With a code block that should not been display
+     */
+    public function test_no_display_webcode() {
+
+
+        $id = 'test:webcode:nodisplay';
+        $webcode = '<' . self::PLUGIN_NAME . '>'
+            . DW_LF
+            . '==== Header ===='
+            . DW_LF
+            . '<code html [display="none"]><p>Hello World</p></code>'
+            . DW_LF
+            . '</' . self::PLUGIN_NAME . '>';
+        saveWikiText($id, $webcode,'First');
+
+        $testRequest = new TestRequest();
+        $testResponse = $testRequest->get(array('id' => $id));
+        // code is render with a pre
+        $iframe = $testResponse->queryHTML('pre' );
+        $this->assertEquals(0, $iframe->length);
 
     }
 

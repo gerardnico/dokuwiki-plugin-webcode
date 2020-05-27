@@ -1,4 +1,4 @@
-====== Webcode ======
+====== Webcode - Across header ======
 
 ===== Description =====
 A webcode may be used across several header in order to create a How to for instance.

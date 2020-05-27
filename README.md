@@ -100,8 +100,15 @@ where:
       * dw (for dokuwiki)
   * `display="none"` will not display the code block (in this case file name and other attributes should not be used)
 
-See the actual [code blocks](https://www.dokuwiki.org/wiki:syntax#code_blocks)
+See:
 
+  * the syntax [code blocks](https://www.dokuwiki.org/wiki:syntax#code_blocks)
+  * and the advanced [one](https://www.dokuwiki.org/syntax_highlighting)
+
+## Examples
+
+  * [Across section example](./_test/data/pages/across_section.txt)
+  * [Cached block (display=none)](./_test/data/pages/display.txt)
 
 ## Language Support
 ### Javascript Console

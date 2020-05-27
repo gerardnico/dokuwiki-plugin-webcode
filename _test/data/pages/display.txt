@@ -8,16 +8,32 @@ This is possible to cache code block with this syntax:
 // cached
 </code>
 </file>
+The ''display="none"'' syntax comes from the [[https://www.dokuwiki.org/syntax_highlighting|advanced syntax]]
 
 ===== Example =====
 
-<webcode name="Default" frameborder=0 renderingMode=story >
-  * We should not see the code block below
+==== Note ====
+
+  * The cached code blocked in the example below is written with this syntax.
+<file javascript>
 <code javascript [display="none"]>
-console.log("This code is not displayed but will be visible in the console.");
+console.log("A log from the cached block");
 </code>
-  * We should see a code block below
+</file>
+
+
+==== The example ====
+ 
+
+<webcode name="Default" frameborder=0 renderingMode=story >
+  * We should not see the cached code block (Only the bullet point of the list)
+
+<code javascript [display="none"]>
+console.log("A log from the cached block.");
+</code>
+  * We should see the code block below
 <code javascript>
-console.log("This code is displayed");
+console.log("A log from the visible block");
 </code>
+  * In the result, we should see two log line (one from the cached block and one from the visible one)
 </webcode>

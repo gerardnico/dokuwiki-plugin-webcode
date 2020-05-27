@@ -18,6 +18,7 @@ class action_plugin_webcode extends DokuWiki_Action_Plugin {
     /**
      * register the event handlers
      *
+     * @param Doku_Event_Handler $controller
      * @author Nicolas GERARD
      */
     function register(Doku_Event_Handler $controller){

@@ -261,9 +261,14 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     }
                     // Render the whole
                     if ($this->attributes["renderingmode"] != "onlyresult") {
+
                         // Replace babel by javascript because babel highlight does not exist in the dokuwiki and babel is only javascript ES2015
                         $matchedTextToRender = preg_replace('/<code[\s]+babel/', '<code javascript', $match);
+
+                        // Delete a display="none" block
                         $matchedTextToRender = preg_replace('/<code([a-z\s]*)\[([a-z\s]*)display="none"([a-z\s]*)\]>(.*)<\/code>/msiU', '', $matchedTextToRender);
+
+                        // Render
                         $instructions = p_get_instructions($matchedTextToRender);
                         $xhtmlWebCode = p_render('xhtml', $instructions, $info);
                     }
