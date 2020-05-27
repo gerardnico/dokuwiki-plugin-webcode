@@ -22,7 +22,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
     // Simple cache bursting implementation for the webCodeConsole.(js|css) file
     // They must be incremented manually when they changed
     const WEB_CONSOLE_CSS_VERSION = 1.1;
-    const WEB_CONSOLE_JS_VERSION = 2.0;
+    const WEB_CONSOLE_JS_VERSION = 2.1;
 
     /**
      * @var array that holds the iframe attributes
@@ -39,34 +39,98 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
      */
     private $useConsole = false;
 
-    /*
-     * What is the type of this plugin ?
-     * This a plugin categorization
-     * This is only important for other plugin
-     * See @getAllowedTypes
+
+    /**
+     * Syntax Type.
+     *
+     * Needs to return one of the mode types defined in $PARSER_MODES in parser.php
+     * @see https://www.dokuwiki.org/devel:syntax_plugins#syntax_types
+     *
+     * container because it may contain header in case of how to
      */
     public function getType()
     {
-        return 'protected';
+        // formatting ?
+        // container
+        return 'container';
+    }
+
+    /**
+     * @return array
+     * Allow which kind of plugin inside
+     *
+     * array('container', 'baseonly','formatting', 'substition', 'protected', 'disabled', 'paragraphs')
+     *
+     */
+    public function getAllowedTypes()
+    {
+        return array('container', 'baseonly', 'formatting', 'substition', 'protected', 'disabled', 'paragraphs');
+    }
+
+    /*
+     * Don't accept the code mode
+     * in order to get the code block
+     * in the DOKU_LEXER_MATCHED state through addPattern
+     */
+    function accepts($mode)
+    {
+        if ($mode == "code") {
+            return false;
+        }
+        return parent::accepts($mode);
     }
 
 
-    // Sort order in which the plugin are applied
+    /**
+     * @see Doku_Parser_Mode::getSort()
+     * The mode (plugin) with the lowest sort number will win out
+     *
+     * See {@link Doku_Parser_Mode_code}
+     */
     public function getSort()
     {
-        return 158;
+        return 199;
     }
 
-    // This where the addEntryPattern must be defined
+    /**
+     * Called before any calls to ConnectTo
+     * @return void
+     */
+    function preConnect()
+    {
+    }
+
+    /**
+     * Create a pattern that will called this plugin
+     *
+     * @param string $mode
+     *
+     * All dokuwiki mode can be seen in the parser.php file
+     * @see Doku_Parser_Mode::connectTo()
+     */
     public function connectTo($mode)
     {
-        $this->Lexer->addEntryPattern('<webcode.*?>(?=.*?</webcode>)', $mode, 'plugin_webcode_' . $this->getPluginComponent());
+
+        $this->Lexer->addEntryPattern('<webcode.*?>(?=.*?</webcode>)', $mode, $this->getPluginMode());
+
     }
+
 
     // This where the addPattern and addExitPattern are defined
     public function postConnect()
     {
-        $this->Lexer->addExitPattern('</webcode>', 'plugin_webcode_' . $this->getPluginComponent());
+
+        /**
+         * Capture all code block
+         * See {@link Doku_Parser_Mode_code}
+         */
+        $this->Lexer->addPattern('<code.*?</code>', $this->getPluginMode());
+
+        /**
+         * End
+         */
+        $this->Lexer->addExitPattern('</webcode>', $this->getPluginMode());
+
     }
 
 
@@ -80,6 +144,17 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
      * This cache may be suppressed with the url parameters ?purge=true
      *
      * The returned values are cached in an array that will be passed to the render method
+     * The handle function goal is to parse the matched syntax through the pattern function
+     * and to return the result for use in the renderer
+     * This result is always cached until the page is modified.
+     * @param string $match
+     * @param int $state
+     * @param int $pos
+     * @param Doku_Handler $handler
+     * @return array|bool
+     * @throws Exception
+     * @see DokuWiki_Syntax_Plugin::handle()
+     *
      */
     public function handle($match, $state, $pos, Doku_Handler $handler)
     {
@@ -110,8 +185,8 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
 
                 if ($result != 0) {
-                    foreach ($matches[1] as $key => $nodeCodeContent) {
-                        $attributeKey = strtolower($nodeCodeContent);
+                    foreach ($matches[1] as $key => $lang) {
+                        $attributeKey = strtolower($lang);
                         $attributeValue = $matches[2][$key];
                         if (in_array($attributeKey, $configAttributes)) {
                             $attributeValue = strtolower($attributeValue);
@@ -127,38 +202,39 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                 // Cache the values to be used by the render method
                 return array($state, $attributes);
 
-            case DOKU_LEXER_UNMATCHED :
+
+            /**
+             * The code block as asked
+             * by addPattern() into {@link postConnect}
+             */
+            case DOKU_LEXER_MATCHED:
+
+                $xhtmlWebCode = "";
 
                 // We got the content between the webcode tag and its attributes
                 // We parse it in order to extract the code in the codes array
                 $codes = array();
-                // Does the javascript contains a console statement
+                /**
+                 * Does the javascript contains a console statement
+                */
                 $useConsole = false;
 
                 // Regexp Pattern to parse the codes block
-                $codePattern = "\<code\s*(\w+)\s*[\w\s\.]*\>(.+?)\<\/code\>";
-                $result = preg_match_all('/' . $codePattern . '/is', $match, $matches, PREG_PATTERN_ORDER);
-                if ($result != 0) {
+                $codePattern = "<code\s*([^>\s]*)\s*([^>\s]*)>(.+?)<\/code>";
+                // The first group is the lang
+                // The second group is the file name and options
+                // The third group is the code
+                $result = preg_match_all('/' . $codePattern . '/msi', $match, $matches, PREG_PATTERN_ORDER);
+                if ($result) {
 
                     // Loop through the block codes
-                    foreach ($matches[1] as $key => $nodeCodeContent) {
+                    foreach ($matches[1] as $key => $lang) {
 
                         // Get the code (The content between the code nodes)
-                        $code = $matches[2][$key];
-
-                        // The attributes of the code element
-                        // Example:<code javascript type="text/babel">
-                        $firstSpace = strpos($nodeCodeContent, " ");
-                        // If there is a space, there is may be attributes
-                        if ($firstSpace) {
-                            $codeName = substr($nodeCodeContent, 0, $firstSpace);
-                        } else {
-                            // There is no attributes, this is the code name
-                            $codeName = $nodeCodeContent;
-                        }
+                        $code = $matches[3][$key];
 
                         // String are in lowercase
-                        $lowerCodeName = strtolower($codeName);
+                        $lowerCodeName = strtolower($lang);
 
                         // Xml is html
                         if ($lowerCodeName == 'xml') {
@@ -183,19 +259,30 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                             }
                         }
                     }
+                    // Render the whole
+                    if ($this->attributes["renderingmode"] != "onlyresult") {
+
+                        // Replace babel by javascript because babel highlight does not exist in the dokuwiki and babel is only javascript ES2015
+                        $matchedTextToRender = preg_replace('/<code[\s]+babel/', '<code javascript', $match);
+
+                        // Delete a display="none" block
+                        $matchedTextToRender = preg_replace('/<code([a-z\s]*)\[([a-z\s]*)display="none"([a-z\s]*)\]>(.*)<\/code>/msiU', '', $matchedTextToRender);
+
+                        // Render
+                        $instructions = p_get_instructions($matchedTextToRender);
+                        $xhtmlWebCode = p_render('xhtml', $instructions, $info);
+                    }
+                    return array($state, $xhtmlWebCode, $codes, $useConsole);
+
+                } else {
+                    throw new Exception("There was a match of the pattern but not when parsing");
                 }
 
-                // Render the whole
-                // Replace babel by javascript because babel highlight does not exist in the dokuwiki and babel is only javascript ES2015
-                $xhtmlWebCode = "";
-                if ($this->attributes["renderingmode"] != "onlyresult") {
-                    $matchedTextToRender = str_replace('babel', 'javascript', $match);
-                    $instructions = p_get_instructions($matchedTextToRender);
-                    $xhtmlWebCode = p_render('xhtml', $instructions, $info);
-                }
+
+            case DOKU_LEXER_UNMATCHED :
 
                 // Cache the values
-                return array($state, $xhtmlWebCode, $codes, $useConsole);
+                return array($state, $match);
 
             case DOKU_LEXER_EXIT:
 
@@ -207,8 +294,15 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
     }
 
     /**
-     * Create output
+     * Render the output
+     * @param string $mode
+     * @param Doku_Renderer $renderer
+     * @param array $data - what the function handle() return'ed
+     * @return bool - rendered correctly (not used)
+     *
      * The rendering process
+     * @see DokuWiki_Syntax_Plugin::render()
+     *
      */
     public function render($mode, Doku_Renderer $renderer, $data)
     {
@@ -217,6 +311,8 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
         // $mode = 'xhtml' means that we output html
         // There is other mode such as metadata where you can output data for the headers (Not 100% sure)
         if ($mode == 'xhtml') {
+
+            /** @var Doku_Renderer_xhtml $renderer */
 
             $state = $data[0];
             switch ($state) {
@@ -228,119 +324,140 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     $this->attributes = $data[1];
                     break;
 
-                case DOKU_LEXER_UNMATCHED :
+                case DOKU_LEXER_MATCHED :
 
                     // The extracted data are the codes for this step
                     // We put them in a class variable so that we can use them in the last step (DOKU_LEXER_EXIT)
-                    $this->codes = $data[2];
-                    $this->useConsole = $data[3];
-                    // Add the wiki output between the two webcode tag
+                    $code = $data[2];
+                    $codeType = key($code);
+                    $this->codes[$codeType] = $this->codes[$codeType]. $code[$codeType];
+
+                    // if not true, see if it's true
+                    if (!$this->useConsole) {
+                        $this->useConsole = $data[3];
+                    }
+
+                    // Render
                     $renderer->doc .= $data[1];
                     break;
 
+                case DOKU_LEXER_UNMATCHED :
+
+                    // Render and escape
+                    $renderer->doc .= $renderer->_xmlEntities($data[1]);
+                    break;
+
                 case DOKU_LEXER_EXIT :
-
-
-                    $htmlContent = '<html><head>';
-                    $htmlContent .= '<meta http-equiv="content-type" content="text/html; charset=UTF-8">';
-                    $htmlContent .= '<title>Made by Webcode</title>';
-                    $htmlContent .= '<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css">';
-
-
-                    // External Resources such as css stylesheet or js
-                    $externalResources = array();
-                    if (array_key_exists(self::EXTERNAL_RESOURCES_ATTRIBUTE_KEY, $this->attributes)) {
-                        $externalResources = explode(",", $this->attributes[self::EXTERNAL_RESOURCES_ATTRIBUTE_KEY]);
+                    // Create the real output of webcode
+                    if (sizeof($this->codes) == 0){
+                        return false;
                     }
+                    // Dokuwiki Code ?
+                    if (array_key_exists('dw', $this->codes)) {
+                        $instructions = p_get_instructions($this->codes['dw']);
+                        $renderer->doc .= p_render('xhtml', $instructions, $info);
+                    } else {
+                        // Js, Html, Css
+                        $htmlContent = '<html><head>';
+                        $htmlContent .= '<meta http-equiv="content-type" content="text/html; charset=UTF-8">';
+                        $htmlContent .= '<title>Made by Webcode</title>';
+                        $htmlContent .= '<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css">';
 
-                    // Babel Preprocessor, if babel is used, add it to the external resources
-                    if (array_key_exists('babel', $this->codes)) {
-                        $babelMin = "https://unpkg.com/babel-standalone@6/babel.min.js";
-                        // a load of babel invoke it (be sure to not have it twice
-                        if (!(array_key_exists($babelMin, $externalResources))) {
-                            $externalResources[] = $babelMin;
+
+                        // External Resources such as css stylesheet or js
+                        $externalResources = array();
+                        if (array_key_exists(self::EXTERNAL_RESOURCES_ATTRIBUTE_KEY, $this->attributes)) {
+                            $externalResources = explode(",", $this->attributes[self::EXTERNAL_RESOURCES_ATTRIBUTE_KEY]);
                         }
-                    }
 
-                    // Add the external resources
-                    foreach ($externalResources as $externalResource) {
-                        $pathInfo = pathinfo($externalResource);
-                        $fileExtension = $pathInfo['extension'];
-                        switch ($fileExtension) {
-                            case 'css':
-                                $htmlContent .= '<link rel="stylesheet" type="text/css" href="' . $externalResource . '">';
-                                break;
-                            case 'js':
-                                $htmlContent .= '<script type="text/javascript" src="' . $externalResource . '"></script>';
-                                break;
+                        // Babel Preprocessor, if babel is used, add it to the external resources
+                        if (array_key_exists('babel', $this->codes)) {
+                            $babelMin = "https://unpkg.com/babel-standalone@6/babel.min.js";
+                            // a load of babel invoke it (be sure to not have it twice
+                            if (!(array_key_exists($babelMin, $externalResources))) {
+                                $externalResources[] = $babelMin;
+                            }
                         }
-                    }
 
-
-                    // WebConsole style sheet
-                    if ($this->useConsole) {
-                        $htmlContent .= '<link rel="stylesheet" type="text/css" href="' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.css?ver=' . self::WEB_CONSOLE_CSS_VERSION . '"></link>';
-                    }
-
-                    if (array_key_exists('css', $this->codes)) {
-                        $htmlContent .= '<!-- The CSS code -->';
-                        $htmlContent .= '<style>' . $this->codes['css'] . '</style>';
-                    };
-                    $htmlContent .= '</head><body style="margin:10px">';
-                    if (array_key_exists('html', $this->codes)) {
-                        $htmlContent .= '<!-- The HTML code -->';
-                        $htmlContent .= $this->codes['html'];
-                    }
-                    // The javascript console area is based at the end of the HTML document
-                    if ($this->useConsole) {
-                        $htmlContent .= '<!-- WebCode Console -->';
-                        $htmlContent .= '<div><p class=\'webConsoleTitle\'>Console Output:</p>';
-                        $htmlContent .= '<div id=\'webCodeConsole\'></div>';
-                        $htmlContent .= '<script type=\'text/javascript\' src=\'' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.js?ver=' . self::WEB_CONSOLE_JS_VERSION . '\'></script>';
-                        $htmlContent .= '</div>';
-                    }
-                    // The javascript comes at the end because it may want to be applied on previous HTML element
-                    // as the page load in the IO order, javascript must be placed at the end
-                    if (array_key_exists('javascript', $this->codes)) {
-                        $htmlContent .= '<!-- The Javascript code -->';
-                        $htmlContent .= '<script type="text/javascript">' . $this->codes['javascript'] . '</script>';
-                    }
-                    if (array_key_exists('babel', $this->codes)) {
-                        $htmlContent .= '<!-- The Babel code -->';
-                        $htmlContent .= '<script type="text/babel">' . $this->codes['babel'] . '</script>';
-                    }
-                    $htmlContent .= '</body></html>';
-
-                    // Here the magic from the plugin happens
-                    // We add the Iframe and the JsFiddleButton
-                    $iFrameHtml = '<iframe ';
-
-                    // We add the name HTML attribute
-                    $name = "WebCode iFrame";
-                    if (array_key_exists('name', $this->attributes)) {
-                        $name .= ' ' . $this->attributes['name'];
-                    }
-                    $iFrameHtml .= ' name="' . $name . '" ';
-
-                    // The class to be able to select them
-                    $iFrameHtml .= ' class="webCode" ';
-
-                    // We add the others HTML attributes
-                    $iFrameHtmlAttributes = array('width', 'height', 'frameborder', 'scrolling');
-                    foreach ($this->attributes as $attribute => $value) {
-                        if (in_array($attribute, $iFrameHtmlAttributes)) {
-                            $iFrameHtml .= ' ' . $attribute . '=' . $value;
+                        // Add the external resources
+                        foreach ($externalResources as $externalResource) {
+                            $pathInfo = pathinfo($externalResource);
+                            $fileExtension = $pathInfo['extension'];
+                            switch ($fileExtension) {
+                                case 'css':
+                                    $htmlContent .= '<link rel="stylesheet" type="text/css" href="' . $externalResource . '">';
+                                    break;
+                                case 'js':
+                                    $htmlContent .= '<script type="text/javascript" src="' . $externalResource . '"></script>';
+                                    break;
+                            }
                         }
+
+
+                        // WebConsole style sheet
+                        if ($this->useConsole) {
+                            $htmlContent .= '<link rel="stylesheet" type="text/css" href="' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.css?ver=' . self::WEB_CONSOLE_CSS_VERSION . '"></link>';
+                        }
+
+                        if (array_key_exists('css', $this->codes)) {
+                            $htmlContent .= '<!-- The CSS code -->';
+                            $htmlContent .= '<style>' . $this->codes['css'] . '</style>';
+                        };
+                        $htmlContent .= '</head><body style="margin:10px">';
+                        if (array_key_exists('html', $this->codes)) {
+                            $htmlContent .= '<!-- The HTML code -->';
+                            $htmlContent .= $this->codes['html'];
+                        }
+                        // The javascript console area is based at the end of the HTML document
+                        if ($this->useConsole) {
+                            $htmlContent .= '<!-- WebCode Console -->';
+                            $htmlContent .= '<div><p class=\'webConsoleTitle\'>Console Output:</p>';
+                            $htmlContent .= '<div id=\'webCodeConsole\'></div>';
+                            $htmlContent .= '<script type=\'text/javascript\' src=\'' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.js?ver=' . self::WEB_CONSOLE_JS_VERSION . '\'></script>';
+                            $htmlContent .= '</div>';
+                        }
+                        // The javascript comes at the end because it may want to be applied on previous HTML element
+                        // as the page load in the IO order, javascript must be placed at the end
+                        if (array_key_exists('javascript', $this->codes)) {
+                            $htmlContent .= '<!-- The Javascript code -->';
+                            $htmlContent .= '<script type="text/javascript">' . $this->codes['javascript'] . '</script>';
+                        }
+                        if (array_key_exists('babel', $this->codes)) {
+                            $htmlContent .= '<!-- The Babel code -->';
+                            $htmlContent .= '<script type="text/babel">' . $this->codes['babel'] . '</script>';
+                        }
+                        $htmlContent .= '</body></html>';
+
+                        // Here the magic from the plugin happens
+                        // We add the Iframe and the JsFiddleButton
+                        $iFrameHtml = '<iframe ';
+
+                        // We add the name HTML attribute
+                        $name = "WebCode iFrame";
+                        if (array_key_exists('name', $this->attributes)) {
+                            $name .= ' ' . $this->attributes['name'];
+                        }
+                        $iFrameHtml .= ' name="' . $name . '" ';
+
+                        // The class to be able to select them
+                        $iFrameHtml .= ' class="webCode" ';
+
+                        // We add the others HTML attributes
+                        $iFrameHtmlAttributes = array('width', 'height', 'frameborder', 'scrolling');
+                        foreach ($this->attributes as $attribute => $value) {
+                            if (in_array($attribute, $iFrameHtmlAttributes)) {
+                                $iFrameHtml .= ' ' . $attribute . '=' . $value;
+                            }
+                        }
+                        $iFrameHtml .= ' srcdoc="' . htmlentities($htmlContent) . '" ></iframe>';//
+
+                        //
+                        $poweredBy = '<div class="webcodeButton"><a href="https://gerardnico.com/wiki/dokuwiki/webcode" class="btn btn-link">' . $this->getLang('RenderedBy') . '</a></div>';
+                        $createdBy = '<div class="webcodeButton"><a href="https://gerardnico.com/wiki/about" class="btn btn-link">' . $this->getLang('MadeWithLoveBy') . '</a></div>';
+
+                        // Add the JsFiddle button
+                        $renderer->doc .= '<div class="webCode">' . $iFrameHtml . $poweredBy . $createdBy . $this->addJsFiddleButton($this->codes, $this->attributes) . '</div>';
                     }
-                    $iFrameHtml .= ' srcdoc="' . htmlentities($htmlContent) . '" ></iframe>';//
-
-                    //
-                    $poweredBy = '<div class="webcodeButton"><a href="https://gerardnico.com/wiki/dokuwiki/webcode" class="btn btn-link">' . $this->getLang('RenderedBy') . '</a></div>';
-                    $createdBy = '<div class="webcodeButton"><a href="https://gerardnico.com/wiki/about" class="btn btn-link">' . $this->getLang('MadeWithLoveBy') . '</a></div>';
-
-                    // Add the JsFiddle button
-                    $renderer->doc .= '<div class="webCode">' . $iFrameHtml . $poweredBy . $createdBy . $this->addJsFiddleButton($this->codes, $this->attributes) . '</div>';
-
 
                     break;
             }
@@ -452,5 +569,17 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
         // TODO
         // http://blog.codepen.io/documentation/api/prefill/
     }
+
+
+    /**
+     * @return string the mode (the name of this plugin for the lexer)
+     */
+    public function getPluginMode()
+    {
+        $pluginName = $this->getPluginName();
+        $pluginComponent = $this->getPluginComponent();
+        return 'plugin_' . $pluginName . '_' . $pluginComponent;
+    }
+
 
 }

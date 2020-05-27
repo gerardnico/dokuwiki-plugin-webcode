@@ -7,6 +7,7 @@ The [Webcode Dokuwiki plugin](https://www.dokuwiki.org/plugin:webcode)  renders 
   * CSS
   * HTML
   * [Javascript](#javascript) or [Babel](#babel)
+  * Dokuwiki 
 
 code block.
 
@@ -54,9 +55,18 @@ Install the plugin using:
     <!-- javascript or babel code block -->
     <code javascript> <!-- or <code babel> -->
     </code>
+    
+    <!-- Dokuwiki Code -->
+    <code dw> 
+    
+    <!-- Code Block not displayed-->
+    <code language [display="none"]>
+    </code>
 
 </webcode>
 ```
+
+### Webcode attributes 
 
 The allowed webcode attributes are:
 
@@ -72,12 +82,33 @@ The allowed webcode attributes are:
       * onlyResult: The rendering will **suppress** the content inside the `webcode` elements and will show only the result after the closing `webcode` code.
 
 
-The actual [code blocks](https://www.dokuwiki.org/wiki:syntax#code_blocks) supported are:
+### code attributes
 
-  * code html (or code xml if html is not present). Xml will be seen as XHTML.
-  * code css
-  * code javascript or babel (but not both)
+The supported code block syntax is
 
+```
+<code lang filePath [display="none"]>
+</code>
+```
+where:
+
+  * lang is:
+      * html 
+      * xml (will be seen as XHTML)
+      * css
+      * javascript or babel (but not both in a webcode)
+      * dw (for dokuwiki)
+  * `display="none"` will not display the code block (in this case file name and other attributes should not be used)
+
+See:
+
+  * the syntax [code blocks](https://www.dokuwiki.org/wiki:syntax#code_blocks)
+  * and the advanced [one](https://www.dokuwiki.org/syntax_highlighting)
+
+## Examples
+
+  * [Across section example](./_test/data/pages/across_section.txt)
+  * [Cached block (display=none)](./_test/data/pages/display.txt)
 
 ## Language Support
 ### Javascript Console
@@ -102,14 +133,30 @@ Technically, the plugin:
   * and a button that permits to play with the code on [JsFiddle](https://jsfiddle.net)
 
 ## Road map
+
+  * Allow Runkit (This [code](https://gerardnico.com/web/javascript/node/script#browser) works on JsFiddle but not in webcode ) may be cause by the restrictions. See below.
+```html
+<iframe name="result" allow="midi *; geolocation *; microphone *; camera *; encrypted-media *;" 
+sandbox="allow-modals allow-forms allow-scripts allow-same-origin allow-popups allow-top-navigation-by-user-activation" allowfullscreen="" allowpaymentrequest="" frameborder="0" src="">
+ </iframe>
+```
   * More language with:
      * [sphere-engine](https://developer.sphere-engine.com/api/compilers) - Online example: https://ideone.com
-     * or [codingground](https://www.tutorialspoint.com/codingground.htm)
+     * or [codingground](https://www.tutorialspoint.com/codingground.htm
+     * [Glot.io](https://github.com/prasmussen/glot)
   * [Mermaid Graph Library](https://mermaidjs.github.io) as language
   * Add the console after initial rendering to not select console element via css
   
 ## Changes
 
+### 2020-05-27
+
+  * Added the possibility to show dokuwiki code if the language extension is dw
+  * Bug: the babel term was replaced by Javascript also in the code. It should be only on the code definition.
+  * Bug: trElement was declared two times in two different scope causing problem
+  * Added the possibility to cache a code block
+  * Webcode has been restructured (with the use of addPattern) and can now wrap headers (level, section). It can then be used for a howto page.
+  * Automatic test and travis has been added
 
 ### 2019-05-14
 
