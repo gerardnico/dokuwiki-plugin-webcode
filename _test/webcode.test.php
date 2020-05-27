@@ -13,45 +13,92 @@ if (!defined('DW_LF')) {
 class dokuwiki_plugin_webcode_basis_test extends DokuWikiTest
 {
 
+    const PLUGIN_NAME = 'webcode';
     protected $pluginsEnabled = array(self::PLUGIN_NAME);
 
+    function setUp(){
+        global $conf;
 
-    const PLUGIN_NAME = 'webcode';
+        parent::setUp();
 
-    public function test_no_code_webcode() {
-
-        $info = array();
-        $instructions = p_get_instructions('<'.self::PLUGIN_NAME.'>'
-            .DW_LF
-            .'==== Header ===='
-            .DW_LF
-            .'</'.self::PLUGIN_NAME.'>');
-        $xhtml = p_render('xhtml', $instructions, $info);
-
-        $expected = '<h1>Header</h1>';
-
-
-        $this->assertEquals($expected, $xhtml);
-
+        // No login to not have the edit button in the output
+        $conf['useacl'] = 0;
     }
 
-    public function test_base_webcode() {
 
-        $info = array();
+
+    /**
+     * With no code block, we should get noiframe
+     * even if there is webcode
+     */
+    public function test_no_code_webcode() {
+
+
         $content='Teaser content';
-        $instructions = p_get_instructions('<'.self::PLUGIN_NAME.'>'
+        $id = 'test:webcode:nowebcode';
+        saveWikiText($id,'<'.self::PLUGIN_NAME.'>'
             .DW_LF
             .'==== Header ===='
             .DW_LF
             .$content
             .DW_LF
-            .'</'.self::PLUGIN_NAME.'>');
-        $xhtml = p_render('xhtml', $instructions, $info);
+            .'</'.self::PLUGIN_NAME.'>','First');
 
-        $expected = '<div class="card" style="width: 18rem;">'.$content.'</div>';
+        $testRequest = new TestRequest();
+        $testResponse = $testRequest->get(array('id' => $id));
+        print($testResponse->getContent());
+        $iframe = $testResponse->queryHTML('iframe' );
+        $this->assertEquals(0, $iframe->length);
+
+    }
+
+    /**
+     * With one code block we should get an iframe
+     */
+    public function test_one_code_block_webcode() {
 
 
-        $this->assertEquals($expected, $xhtml);
+        $content='Teaser content';
+        $id = 'test:webcode:nowebcode';
+        saveWikiText($id,'<'.self::PLUGIN_NAME.'>'
+            .DW_LF
+            .'==== Header ===='
+            .DW_LF
+            .$content
+            .'<code><p>Hello World</p></code>'
+            .DW_LF
+            .'</'.self::PLUGIN_NAME.'>','First');
+
+        $testRequest = new TestRequest();
+        $testResponse = $testRequest->get(array('id' => $id));
+        print($testResponse->getContent());
+        $iframe = $testResponse->queryHTML('iframe' );
+        $this->assertEquals(1, $iframe->length);
+
+    }
+
+    /**
+     * With two webcode, we should get two iframes
+     */
+    public function test_two_webcode() {
+
+        $content='Teaser content';
+        $id = 'test:webcode:twowebcode';
+        $webcode = '<' . self::PLUGIN_NAME . '>'
+            . DW_LF
+            . '==== Header ===='
+            . DW_LF
+            . $content
+            . '<code><p>Hello World</p></code>'
+            . DW_LF
+            . '</' . self::PLUGIN_NAME . '>';
+        saveWikiText($id, $webcode.$webcode,'First');
+
+        $testRequest = new TestRequest();
+        $testResponse = $testRequest->get(array('id' => $id));
+        print($testResponse->getContent());
+        $iframe = $testResponse->queryHTML('iframe' );
+        $this->assertEquals(2, $iframe->length);
 
     }
 

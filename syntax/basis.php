@@ -344,7 +344,9 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
                 case DOKU_LEXER_EXIT :
                     // Create the real output of webcode
-
+                    if (sizeof($this->codes) == 0){
+                        return false;
+                    }
                     // Dokuwiki Code ?
                     if (array_key_exists('dw', $this->codes)) {
                         $instructions = p_get_instructions($this->codes['dw']);
