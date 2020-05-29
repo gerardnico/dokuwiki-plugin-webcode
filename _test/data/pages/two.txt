@@ -1,0 +1,19 @@
+====== Webcode - Two webcode in a page ======
+
+===== About =====
+This is to be sure that two webcode on a page will only show one output
+
+===== Test =====
+
+  * One emoji [[unicode>1F600|Smiley (1F600)]] in a webcode
+<webcode name="Default" frameborder=0 width=100% scrolling=yes externalResources="," renderingMode=story >
+<code html>
+<span style="font-size:30pt">&#x1F600;</span>
+</code>
+</webcode>
+  * The below snippet should show only one emoji and not the above emoji
+<webcode name="Default" frameborder=0 width=100% scrolling=yes externalResources="," renderingMode=story >
+<code html>
+<span style="font-size:30pt">&#x1F41E;</span>
+</code>
+</webcode>
