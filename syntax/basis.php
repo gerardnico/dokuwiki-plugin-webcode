@@ -322,6 +322,10 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     // The extracted data are the attribute of the webcode tag
                     // We put in a class variable so that we can use in the last step (DOKU_LEXER_EXIT)
                     $this->attributes = $data[1];
+
+                    // Reinit the codes to make sure that the code does not leak into another webcode
+                    $this->useConsole = false;
+                    $this->codes = array();
                     break;
 
                 case DOKU_LEXER_MATCHED :
