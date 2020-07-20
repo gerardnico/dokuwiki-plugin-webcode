@@ -231,7 +231,8 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     foreach ($matches[1] as $key => $lang) {
 
                         // Get the code (The content between the code nodes)
-                        $code = $matches[3][$key];
+                        // We ltrim because the match gives us the \n at the beginning and at the end
+                        $code = ltrim($matches[3][$key]);
 
                         // String are in lowercase
                         $lowerCodeName = strtolower($lang);
