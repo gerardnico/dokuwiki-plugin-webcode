@@ -7,6 +7,8 @@
  */
 
 // must be run within Dokuwiki
+use dokuwiki\Extension\Event;
+
 if (!defined('DOKU_INC')) die();
 
 /**
@@ -38,6 +40,49 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
      * Print the output of the console javascript function ?
      */
     private $useConsole = false;
+
+    /**
+     * @param $mode
+     * @param array $instructions
+     * @param array $info - the $info of the renderer to pass context information
+     * @return string|null
+     * Wrapper around {@link p_render()} that pass the $info through tho the created Renderer
+     */
+    private static function p_render($mode, array $instructions, array &$info)
+    {
+        if (is_null($instructions)) return '';
+        if ($instructions === false) return '';
+
+        $Renderer = p_get_renderer($mode);
+        if (is_null($Renderer)) return null;
+
+        $Renderer->reset();
+        if (!empty($info)) {
+            $Renderer->info = $info;
+        }
+
+        $Renderer->smileys = getSmileys();
+        $Renderer->entities = getEntities();
+        $Renderer->acronyms = getAcronyms();
+        $Renderer->interwiki = getInterwiki();
+
+        // Loop through the instructions
+        foreach ($instructions as $instruction) {
+            // Execute the callback against the Renderer
+            if (method_exists($Renderer, $instruction[0])) {
+                call_user_func_array(array(&$Renderer, $instruction[0]), $instruction[1] ? $instruction[1] : array());
+            }
+        }
+
+        //set info array
+        $info = $Renderer->info;
+
+        // Post process and return the output
+        $data = array($mode, & $Renderer->doc);
+        Event::createAndTrigger('RENDERER_CONTENT_POSTPROCESS', $data);
+        return $Renderer->doc;
+
+    }
 
 
     /**
@@ -164,7 +209,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
                 // We got the first webcode tag and its attributes
 
-                $match = utf8_substr($match, 8, -1); //9 = strlen("<webcode")
+                $match = substr($match, 8, -1); //9 = strlen("<webcode")
 
                 // Reset of the attributes
                 // With some framework the php object may be still persisted in memory
@@ -260,6 +305,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                             }
                         }
                     }
+                    $matchedTextToRender="";
                     // Render the whole
                     if ($this->attributes["renderingmode"] != "onlyresult") {
 
@@ -269,11 +315,8 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                         // Delete a display="none" block
                         $matchedTextToRender = preg_replace('/<code([a-z\s]*)\[([a-z\s]*)display="none"([a-z\s]*)\]>(.*)<\/code>/msiU', '', $matchedTextToRender);
 
-                        // Render
-                        $instructions = p_get_instructions($matchedTextToRender);
-                        $xhtmlWebCode = p_render('xhtml', $instructions, $info);
                     }
-                    return array($state, $xhtmlWebCode, $codes, $useConsole);
+                    return array($state, $matchedTextToRender, $codes, $useConsole);
 
                 } else {
                     throw new Exception("There was a match of the pattern but not when parsing");
@@ -343,7 +386,12 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     }
 
                     // Render
-                    $renderer->doc .= $data[1];
+                    $textToRender = $data[1];
+                    if (!empty($textToRender)) {
+                        $instructions = p_get_instructions($textToRender);
+                        $xhtmlWebCode = self::p_render('xhtml', $instructions, $renderer->info);
+                        $renderer->doc .= $xhtmlWebCode;
+                    }
                     break;
 
                 case DOKU_LEXER_UNMATCHED :
@@ -360,8 +408,9 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     // Dokuwiki Code ?
                     if (array_key_exists('dw', $this->codes)) {
                         $instructions = p_get_instructions($this->codes['dw']);
-                        $renderer->doc .= p_render('xhtml', $instructions, $info);
+                        $renderer->doc .= self::p_render('xhtml', $instructions, $renderer->info);
                     } else {
+
                         // Js, Html, Css
                         $htmlContent = '<html><head>';
                         $htmlContent .= '<meta http-equiv="content-type" content="text/html; charset=UTF-8">';
