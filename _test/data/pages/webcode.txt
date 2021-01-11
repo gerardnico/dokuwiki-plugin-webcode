@@ -5,5 +5,6 @@
 The visual test of webcode
   * [[display]]: This is possible to cache an individual code block
   * [[across_section]]: Across section, the webcode should not break the TOC
+  * [[two]]: be sure to not leak code from one webcode block to another
 
  

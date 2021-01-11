@@ -1,8 +1,7 @@
 ====== Webcode - Two webcode in a page ======
 
 ===== About =====
-This is to be sure that two webcode on a page will only show one output
-
+This is to be sure not leak code from one webcode block to another
 ===== Test =====
 
   * One emoji [[unicode>1F600|Smiley (1F600)]] in a webcode
