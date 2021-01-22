@@ -68,7 +68,7 @@ class dokuwiki_plugin_webcode_test extends DokuWikiTest
      *    - https://www.dokuwiki.org/devel:metadata
      *
      * You can add a meta to the index and lookup the pages with this key
-     * You cannot retrieve the meta unfortuntaley
+     * You cannot retrieve the meta unfortunately
      */
     public function test_metaInIndex(){
 
