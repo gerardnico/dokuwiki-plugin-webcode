@@ -134,7 +134,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
      */
     public function getSort()
     {
-        return 199;
+        return 100;
     }
 
     /**
