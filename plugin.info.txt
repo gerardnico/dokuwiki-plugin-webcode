@@ -1,8 +1,7 @@
 base     webcode
-author   Nicolas GERARD
-email    gerardnico@gmail.com
-date     2020-27-05
+author   ComboStrap
+email    support@combostrap.com
+date     2021-02-02
 name     Webcode Plugin
 desc     Plugin that shows and adds the result of (web|browser) code (ie HTML, CSS or Javascript)
-url      https://www.dokuwiki.org/plugin:webcode
-url      https://github.com/gerardnico/dokuwiki-plugin-webcode
+url      https://combostrap.com/webcode
