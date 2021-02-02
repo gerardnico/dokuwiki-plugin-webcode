@@ -119,7 +119,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
      */
     function accepts($mode)
     {
-        if ($mode == "code") {
+        if ($mode == "code" || $mode == "plugin_combo_code") {
             return false;
         }
         return parent::accepts($mode);
