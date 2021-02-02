@@ -1,23 +1,23 @@
-# dokuwiki-plugin-webcode
+# Webcode component (Render HTML, Javascript and CSS)
 
 ## Usage
 
-The [Webcode Dokuwiki plugin](https://www.dokuwiki.org/plugin:webcode)  renders the output of:
+The [Webcode component](https://combostrap.com/webcode)  renders the output of:
 
   * CSS
   * HTML
   * [Javascript](#javascript) or [Babel](#babel)
-  * Dokuwiki 
+  * Dokuwiki
 
 code block.
 
-By enclosing the [code blocks](https://www.dokuwiki.org/wiki:syntax#code_blocks) by a `<webcode>` block, the plugin will add the result after the last webcode tag.
+By enclosing code block by a `<webcode>` block, the plugin will add the result after the last webcode tag.
 
-See the webcode plugin page on Dokuwiki [here](https://www.dokuwiki.org/plugin:webcode)
+See the [webcode documentation](https://combostrap.com/webcode)
 
 ## Example
 
-See the plugin in action [here](http://gerardnico.com/wiki/dokuwiki/webcode).
+See the plugin in action [here](https://combostrap.com/webcode).
 
 ## Illustration
 
@@ -31,97 +31,21 @@ Install the plugin using:
   * [manually](https://www.dokuwiki.org/plugin:Plugins) with the [download URL](http://github.com/gerardnico/dokuwiki-plugin-webcode/zipball/master), which points to latest version of the plugin.
 
 
-## Syntax
 
-```xml
+## Road map
 
-<webcode name="A Name" width=100% frameborder=0 height=250px externalResources="//d3js.org/d3.v3.min.js,https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-
-    <!-- wiki syntax with css or html block code. -->
-    Full dokuwiki syntax are permitted between blocks
-
-    <!-- css code block -->
-    <code css>
-    </code>
-
-    <!-- html code block -->
-    <code html>
-    </code>
-
-    <!-- An xml block may be use in place of an html one -->
-    <code xml>
-    </code>
-
-    <!-- javascript or babel code block -->
-    <code javascript> <!-- or <code babel> -->
-    </code>
-    
-    <!-- Dokuwiki Code -->
-    <code dw> 
-    
-    <!-- Code Block not displayed-->
-    <code language [display="none"]>
-    </code>
-
-</webcode>
+  * Allow Runkit (This [code](https://gerardnico.com/web/javascript/node/script#browser) works on JsFiddle but not in webcode ) may be cause by the restrictions. See below.
+```html
+<iframe name="result" allow="midi *; geolocation *; microphone *; camera *; encrypted-media *;"
+sandbox="allow-modals allow-forms allow-scripts allow-same-origin allow-popups allow-top-navigation-by-user-activation" allowfullscreen="" allowpaymentrequest="" frameborder="0" src="">
+ </iframe>
 ```
-
-### Webcode attributes 
-
-The allowed webcode attributes are:
-
-   * the following attributes of the [iframe element](https://docs.webplatform.org/wiki/html/elements/iframe)
-      * name. It will be added as a suffix
-      * frameborder (default to 0)
-      * width (default to 100%)
-      * height
-      * scrolling
-   * externalResources: a comma separated list of external resources. (Ie an URL of a Css or Js file, generally a CDN)
-   * renderingMode: 
-      * story (default): The rendering will output the content inside the `webcode` elements and add the result after the closing `webcode` code.
-      * onlyResult: The rendering will **suppress** the content inside the `webcode` elements and will show only the result after the closing `webcode` code.
-
-
-### code attributes
-
-The supported code block syntax is
-
-```
-<code lang filePath [display="none"]>
-</code>
-```
-where:
-
-  * lang is:
-      * html 
-      * xml (will be seen as XHTML)
-      * css
-      * javascript or babel (but not both in a webcode)
-      * dw (for dokuwiki)
-  * `display="none"` will not display the code block (in this case file name and other attributes should not be used)
-
-See:
-
-  * the syntax [code blocks](https://www.dokuwiki.org/wiki:syntax#code_blocks)
-  * and the advanced [one](https://www.dokuwiki.org/syntax_highlighting)
-
-## Examples
-
-  * [Across section example](./_test/data/pages/across_section.txt)
-  * [Cached block (display=none)](./_test/data/pages/display.txt)
-
-## Language Support
-### Javascript Console
-
-  * The [console.log function](https://developer.mozilla.org/en-US/docs/Web/API/Console/log) will be rendered and therefore visible in a console area (Gray box).
-  * The [console.table function](https://developer.mozilla.org/en-US/docs/Web/API/Console/table) is supported only for a collection of objects or primitives. There is no second argument.
-
-### Babel
-
-When a code block use [Babel](https://babeljs.io/) as language, the plugin will add the 
-[babel.min.js](https://unpkg.com/babel-standalone@6/babel.min.js) version 6 to the external resources.
-
-You cannot have a Babel and a Javascript Block.
+  * More language with:
+     * [sphere-engine](https://developer.sphere-engine.com/api/compilers) - Online example: https://ideone.com
+     * or [codingground](https://www.tutorialspoint.com/codingground.htm
+     * [Glot.io](https://github.com/prasmussen/glot)
+  * [Mermaid Graph Library](https://mermaidjs.github.io) as language
+  * Add the console after initial rendering to not select console element via css
 
 ## Technically
 
@@ -132,22 +56,13 @@ Technically, the plugin:
   * adds after the last webcode tag an [iframe](https://docs.webplatform.org/wiki/html/elements/iframe),
   * and a button that permits to play with the code on [JsFiddle](https://jsfiddle.net)
 
-## Road map
 
-  * Allow Runkit (This [code](https://gerardnico.com/web/javascript/node/script#browser) works on JsFiddle but not in webcode ) may be cause by the restrictions. See below.
-```html
-<iframe name="result" allow="midi *; geolocation *; microphone *; camera *; encrypted-media *;" 
-sandbox="allow-modals allow-forms allow-scripts allow-same-origin allow-popups allow-top-navigation-by-user-activation" allowfullscreen="" allowpaymentrequest="" frameborder="0" src="">
- </iframe>
-```
-  * More language with:
-     * [sphere-engine](https://developer.sphere-engine.com/api/compilers) - Online example: https://ideone.com
-     * or [codingground](https://www.tutorialspoint.com/codingground.htm
-     * [Glot.io](https://github.com/prasmussen/glot)
-  * [Mermaid Graph Library](https://mermaidjs.github.io) as language
-  * Add the console after initial rendering to not select console element via css
-  
 ## Changes
+
+### 2021-02-02
+
+  * The bar (`rendered by` and `Try the code`) are now less prominent and follows the [prism style](https://prismjs.com/plugins/toolbar/)
+  * The documentation has moved to ComboStrap.
 
 ### 2020-05-27
 
@@ -163,12 +78,12 @@ sandbox="allow-modals allow-forms allow-scripts allow-same-origin allow-popups a
   * Firebug console was not added when the language was Babel
   * The output on the console log is now escaped for HTML entities and can then render HTML
   * There was a bug with the declaration of a variable
-  
+
 ### 2019-02-06
 
   * To be able to see the output of a `console.log` javascript statement in JsFiddle, the firebug resources have been added (The JsFiddle feature was broken)
   * New publication date on Dokuwiki
-   
+
 ### 2017-10-22
 
   * Added a `renderingMode` argument to be able to show only the result
@@ -182,7 +97,7 @@ sandbox="allow-modals allow-forms allow-scripts allow-same-origin allow-popups a
 ### 2017-06-07
 
   * The height of the Iframe is now dynamically calculated. No need to give this attribute anymore if you want to see the whole output.
-  
+
 ### 2017-04-28
 
   * Added [Babel](https://babeljs.io/) support
@@ -195,4 +110,4 @@ sandbox="allow-modals allow-forms allow-scripts allow-same-origin allow-popups a
   * Two block of the same code are now concatenated
   * Jquery is no more used. It was used for the javascript part of the console functionality.
   * XML is now seen as HTML
-  * The ''name'' 
+  * The ''name''
