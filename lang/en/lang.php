@@ -11,7 +11,6 @@
 $lang['WebCodeButtonTitle'] = 'Insert a Web code';
 $lang['Accesskey'] = 'Accesskey';
 $lang['JsFiddleButtonContent'] = 'Try the code on JsFiddle';
-$lang['MadeWithLoveBy'] = 'Made with &#10084; by Nico';
 $lang['RenderedBy'] = 'Rendered by WebCode';
 
 ?>

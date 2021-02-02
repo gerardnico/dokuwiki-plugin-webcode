@@ -261,7 +261,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                 $codes = array();
                 /**
                  * Does the javascript contains a console statement
-                */
+                 */
                 $useConsole = false;
 
                 // Regexp Pattern to parse the codes block
@@ -305,7 +305,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                             }
                         }
                     }
-                    $matchedTextToRender="";
+                    $matchedTextToRender = "";
                     // Render the whole
                     if ($this->attributes["renderingmode"] != "onlyresult") {
 
@@ -378,7 +378,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                     // We put them in a class variable so that we can use them in the last step (DOKU_LEXER_EXIT)
                     $code = $data[2];
                     $codeType = key($code);
-                    $this->codes[$codeType] = $this->codes[$codeType]. $code[$codeType];
+                    $this->codes[$codeType] = $this->codes[$codeType] . $code[$codeType];
 
                     // if not true, see if it's true
                     if (!$this->useConsole) {
@@ -402,7 +402,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
                 case DOKU_LEXER_EXIT :
                     // Create the real output of webcode
-                    if (sizeof($this->codes) == 0){
+                    if (sizeof($this->codes) == 0) {
                         return false;
                     }
                     // Dokuwiki Code ?
@@ -442,7 +442,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                                     $htmlContent .= '<link rel="stylesheet" type="text/css" href="' . $externalResource . '">';
                                     break;
                                 case 'js':
-                                    $htmlContent .= '<script type="text/javascript" src="' . $externalResource . '"></script>';
+                                    $htmlContent .= '<script type="text/javascript" src="' . $externalResource . '"/>';
                                     break;
                             }
                         }
@@ -450,7 +450,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
 
                         // WebConsole style sheet
                         if ($this->useConsole) {
-                            $htmlContent .= '<link rel="stylesheet" type="text/css" href="' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.css?ver=' . self::WEB_CONSOLE_CSS_VERSION . '"></link>';
+                            $htmlContent .= '<link rel="stylesheet" type="text/css" href="' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.css?ver=' . self::WEB_CONSOLE_CSS_VERSION . '"/>';
                         }
 
                         if (array_key_exists('css', $this->codes)) {
@@ -466,8 +466,8 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                         if ($this->useConsole) {
                             $htmlContent .= '<!-- WebCode Console -->';
                             $htmlContent .= '<div><p class=\'webConsoleTitle\'>Console Output:</p>';
-                            $htmlContent .= '<div id=\'webCodeConsole\'></div>';
-                            $htmlContent .= '<script type=\'text/javascript\' src=\'' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.js?ver=' . self::WEB_CONSOLE_JS_VERSION . '\'></script>';
+                            $htmlContent .= '<div id=\'webCodeConsole\'/>';
+                            $htmlContent .= '<script type=\'text/javascript\' src=\'' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.js?ver=' . self::WEB_CONSOLE_JS_VERSION . '\'/>';
                             $htmlContent .= '</div>';
                         }
                         // The javascript comes at the end because it may want to be applied on previous HTML element
@@ -505,12 +505,12 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                         }
                         $iFrameHtml .= ' srcdoc="' . htmlentities($htmlContent) . '" ></iframe>';//
 
-                        //
-                        $poweredBy = '<div class="webcodeButton"><a href="https://gerardnico.com/wiki/dokuwiki/webcode" class="btn btn-link">' . $this->getLang('RenderedBy') . '</a></div>';
-                        $createdBy = '<div class="webcodeButton"><a href="https://gerardnico.com/wiki/about" class="btn btn-link">' . $this->getLang('MadeWithLoveBy') . '</a></div>';
-
-                        // Add the JsFiddle button
-                        $renderer->doc .= '<div class="webCode">' . $iFrameHtml . $poweredBy . $createdBy . $this->addJsFiddleButton($this->codes, $this->attributes) . '</div>';
+                        // Credits bar
+                        $bar = '<div class="webcode-bar">';
+                        $bar .= '<div class="webcode-bar-item"><a href="https://combostrap.com/webcode">' . $this->getLang('RenderedBy') . '</a></div>';
+                        $bar .= '<div class="webcode-bar-item">'.$this->addJsFiddleButton($this->codes, $this->attributes).'</div>';
+                        $bar .= '</div>';
+                        $renderer->doc .= '<div class="webcode">' . $iFrameHtml . $bar . '</div>';
                     }
 
                     break;
@@ -522,8 +522,8 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
     }
 
     /**
-     * @param $codes the array containing the codes
-     * @param $attributes the attributes of a call (for now the externalResources)
+     * @param array $codes the array containing the codes
+     * @param array $attributes the attributes of a call (for now the externalResources)
      * @return string the HTML form code
      *
      * Specification, see http://doc.jsfiddle.net/api/post.html
@@ -593,23 +593,17 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
             $title = "Code from " . $pageTitle;
         }
         $description = "Code from the page '" . $pageTitle . "' \n" . wl($ID, $absolute = true);
-
-        $jsFiddleButtonHtmlCode =
-            '<div class="webcodeButton">' .
-            '<form method="post" action="' . $postURL . '" target="_blank">' .
-            '<input type="hidden" name="title" value="' . htmlentities($title) . '">' .
-            '<input type="hidden" name="description" value="' . htmlentities($description) . '">' .
-            '<input type="hidden" name="css" value="' . htmlentities($codes['css']) . '">' .
-            '<input type="hidden" name="html" value="' . htmlentities("<!-- The HTML -->" . $codes['html']) . '">' .
-            '<input type="hidden" name="js" value="' . htmlentities($jsCode) . '">' .
-            '<input type="hidden" name="panel_js" value="' . htmlentities($jsPanel) . '">' .
-            '<input type="hidden" name="wrap" value="b">' .  //javascript no wrap in body
-            $externalResourcesInput .
-            '<button class="btn btn-link">' . $this->getLang('JsFiddleButtonContent') . '</button>' .
-            '</form>' .
-            '</div>';
-
-        return $jsFiddleButtonHtmlCode;
+        return '<form  method="post" action="' . $postURL . '" target="_blank">' .
+        '<input type="hidden" name="title" value="' . htmlentities($title) . '">' .
+        '<input type="hidden" name="description" value="' . htmlentities($description) . '">' .
+        '<input type="hidden" name="css" value="' . htmlentities($codes['css']) . '">' .
+        '<input type="hidden" name="html" value="' . htmlentities("<!-- The HTML -->" . $codes['html']) . '">' .
+        '<input type="hidden" name="js" value="' . htmlentities($jsCode) . '">' .
+        '<input type="hidden" name="panel_js" value="' . htmlentities($jsPanel) . '">' .
+        '<input type="hidden" name="wrap" value="b">' .  //javascript no wrap in body
+        $externalResourcesInput .
+        '<button>' . $this->getLang('JsFiddleButtonContent') . '</button>' .
+        '</form>';
 
     }
 
