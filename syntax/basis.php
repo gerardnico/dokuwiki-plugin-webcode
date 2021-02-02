@@ -442,7 +442,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                                     $htmlContent .= '<link rel="stylesheet" type="text/css" href="' . $externalResource . '">';
                                     break;
                                 case 'js':
-                                    $htmlContent .= '<script type="text/javascript" src="' . $externalResource . '"/>';
+                                    $htmlContent .= '<script type="text/javascript" src="' . $externalResource . '"></script>';
                                     break;
                             }
                         }
@@ -467,7 +467,7 @@ class syntax_plugin_webcode_basis extends DokuWiki_Syntax_Plugin
                             $htmlContent .= '<!-- WebCode Console -->';
                             $htmlContent .= '<div><p class=\'webConsoleTitle\'>Console Output:</p>';
                             $htmlContent .= '<div id=\'webCodeConsole\'/>';
-                            $htmlContent .= '<script type=\'text/javascript\' src=\'' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.js?ver=' . self::WEB_CONSOLE_JS_VERSION . '\'/>';
+                            $htmlContent .= '<script type=\'text/javascript\' src=\'' . DOKU_URL . 'lib/plugins/webcode/webCodeConsole.js?ver=' . self::WEB_CONSOLE_JS_VERSION . '\'></script>';
                             $htmlContent .= '</div>';
                         }
                         // The javascript comes at the end because it may want to be applied on previous HTML element
