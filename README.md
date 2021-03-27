@@ -1,3 +1,7 @@
+>
+> Deprecated and Moved to https://combostrap.com/webcode
+>
+
 # Webcode component (Render HTML, Javascript and CSS)
 
 ## Usage
